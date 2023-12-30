@@ -133,3 +133,15 @@ void APMPCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
+
+void APMPCharacter::Attack()
+{
+}
+
+void APMPCharacter::Skill_1()
+{
+}
+
+void APMPCharacter::Skill_2()
+{
+}

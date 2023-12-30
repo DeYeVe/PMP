@@ -33,3 +33,18 @@ void APMPCharacterAurora::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 }
+
+void APMPCharacterAurora::Attack()
+{
+	Super::Attack();
+}
+
+void APMPCharacterAurora::Skill_1()
+{
+	Super::Skill_1();
+}
+
+void APMPCharacterAurora::Skill_2()
+{
+	Super::Skill_2();
+}

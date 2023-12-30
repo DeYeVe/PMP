@@ -78,11 +78,26 @@ public:
 	
 	USkeletalMeshComponent* GetMesh() const { return MeshCharacter; }
 
-private:
+protected:
 	UPROPERTY()
 	FVector2D MovementVector;
 
 public:
 	FVector2D GetMovementVector() const { return MovementVector; }
+	
+protected:
+	int CurHP;
+	int MaxHP;
+
+	
+public:
+	int GetCurHP() const { return CurHP; };
+	
+	void SetCurHP(int HP) { CurHP = HP; };
+
+public:
+	virtual void Attack();
+	virtual void Skill_1();
+	virtual void Skill_2();
 };
 

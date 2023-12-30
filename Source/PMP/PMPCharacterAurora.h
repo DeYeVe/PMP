@@ -23,5 +23,10 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaSeconds) override;
+
+public:
+	virtual void Attack() override;
+	virtual void Skill_1() override;
+	virtual void Skill_2() override;
 	
 };

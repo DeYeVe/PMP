@@ -3,7 +3,9 @@
 
 #include "PMPMonsterWolf.h"
 
+#include "PMPAIController.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 APMPMonsterWolf::APMPMonsterWolf()
 {
@@ -22,6 +24,11 @@ APMPMonsterWolf::APMPMonsterWolf()
 	{
 		MeshMonster->SetSkeletalMesh(SM.Object);
 	}
+	
+	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	
+	AIControllerClass = APMPAIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void APMPMonsterWolf::BeginPlay()

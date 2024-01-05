@@ -20,11 +20,15 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 public:
-	void PlayAuroraActionMontage();
+	void PlayAuroraAttackMontage(int32 Index);
+
+private:
+	UFUNCTION()
+	void AnimNotify_Attack();
 	
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Aurora, Meta=(AllowPrivateAccess=true)) \
-	UAnimMontage* AuroraActionMontage;
+	UAnimMontage* AuroraAttackMontage;
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
@@ -35,13 +39,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
 	FVector2D MovementVector;
-	
-	/*
-
-public:
-	UFUNCTION(BlueprintCallable, Category = "Animation", meta = (BluePrintThreadSafe))
-	float GetSpeed() const { return Speed; }
-	
-	UFUNCTION(BlueprintCallable, Category = "Animation")
-	FVector2D GetMovementVector() const { return MovementVector; }*/
 };

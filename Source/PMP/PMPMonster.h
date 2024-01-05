@@ -38,13 +38,16 @@ public:
 
 	
 protected:
-	int Damage;
-	int MaxHP;
-	int CurHP;
+	UPROPERTY()
+	int32 Damage;
+	UPROPERTY()
+	int32 MaxHP;
+	UPROPERTY()
+	int32 CurHP;
 	
 public:
 	UFUNCTION()
-	int GetDamage() const { return Damage; };
+	int32 GetDamage() const { return Damage; };
 	
 	UFUNCTION()
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;

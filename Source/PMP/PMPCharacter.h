@@ -42,8 +42,20 @@ protected:
 	UInputAction* MoveAction;
 
 	/** Look Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))	
 	UInputAction* LookAction;
+	
+	/** Attack Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* AttackAction;
+	
+	/** Skill1 Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SkillAction_1;
+	
+	/** Skill2 Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SkillAction_2;
 	
 	UPROPERTY(VisibleAnywhere, Category=Mesh)
 	USkeletalMeshComponent* MeshCharacter;
@@ -70,6 +82,8 @@ protected:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -82,22 +96,32 @@ protected:
 	UPROPERTY()
 	FVector2D MovementVector;
 
+	UPROPERTY()
+	class UPMPAnimInstance* AnimInstance;
+
 public:
 	FVector2D GetMovementVector() const { return MovementVector; }
 	
 protected:
-	int CurHP;
-	int MaxHP;
+	UPROPERTY()
+	int32 CurHP;
+	UPROPERTY()
+	int32 MaxHP;
 
 	
 public:
-	int GetCurHP() const { return CurHP; };
+	int32 GetCurHP() const { return CurHP; };
 	
-	void SetCurHP(int HP) { CurHP = HP; };
+	void SetCurHP(int32 HP) { CurHP = HP; };
 
 public:
+	UFUNCTION()
 	virtual void Attack();
+	
+	UFUNCTION()
 	virtual void Skill_1();
+	
+	UFUNCTION()
 	virtual void Skill_2();
 };
 

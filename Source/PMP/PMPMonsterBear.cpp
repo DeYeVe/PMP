@@ -2,7 +2,10 @@
 
 
 #include "PMPMonsterBear.h"
+
+#include "PMPAIController.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 APMPMonsterBear::APMPMonsterBear()
 {
@@ -21,6 +24,11 @@ APMPMonsterBear::APMPMonsterBear()
 	{
 		MeshMonster->SetSkeletalMesh(SM.Object);
 	}
+
+	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	
+	AIControllerClass = APMPAIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void APMPMonsterBear::BeginPlay()

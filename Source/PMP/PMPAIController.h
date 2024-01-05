@@ -14,6 +14,19 @@ class PMP_API APMPAIController : public AAIController
 {
 	GENERATED_BODY()
 
+	/**
+	 * 
+	 */
+public:
 	APMPAIController();
+
+	virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnUnPossess() override;
+
+private:
+	void MoveRandom();
+
+private:
+	FTimerHandle TimerHandle;
 	
 };

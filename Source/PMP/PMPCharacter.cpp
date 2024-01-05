@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "PMPAnimInstance.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -67,11 +68,18 @@ void APMPCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	AnimInstance = Cast<UPMPAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
 void APMPCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+}
+
+void APMPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -91,6 +99,15 @@ void APMPCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APMPCharacter::Look);
+
+		// Attack
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &APMPCharacter::Attack);
+		
+		// Skill 1
+		EnhancedInputComponent->BindAction(SkillAction_1, ETriggerEvent::Triggered, this, &APMPCharacter::Skill_1);
+		
+		// Skill 2
+		EnhancedInputComponent->BindAction(SkillAction_2, ETriggerEvent::Triggered, this, &APMPCharacter::Skill_2);
 	}
 	else
 	{

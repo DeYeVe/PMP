@@ -3,6 +3,9 @@
 
 #include "PMPCharacterAurora.h"
 
+#include "PMPAnimInstance.h"
+#include "Net/UnrealNetwork.h"
+
 APMPCharacterAurora::APMPCharacterAurora()
 {	
 	MeshCharacter = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshAurora"));
@@ -27,6 +30,8 @@ void APMPCharacterAurora::SetupPlayerInputComponent(UInputComponent* PlayerInput
 void APMPCharacterAurora::BeginPlay()
 {
 	Super::BeginPlay();
+
+	AnimInstance->OnMontageEnded.AddDynamic(this, &APMPCharacterAurora::OnAttackMontageEnded);
 }
 
 void APMPCharacterAurora::Tick(float DeltaSeconds)
@@ -34,9 +39,46 @@ void APMPCharacterAurora::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
+void APMPCharacterAurora::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APMPCharacterAurora, IsActing);
+}
+
 void APMPCharacterAurora::Attack()
 {
 	Super::Attack();
+
+	if (!HasAuthority())
+		LocalAttack();
+	
+	ServerAttack();
+}
+
+void APMPCharacterAurora::LocalAttack()
+{	
+	if(IsActing)
+		return;
+	
+	AnimInstance->PlayAuroraAttackMontage(AttackIndex);
+	
+	AttackIndex = (AttackIndex + 1) % 3;
+	
+	IsActing = true;
+}
+
+void APMPCharacterAurora::ServerAttack_Implementation()
+{
+	MulticastAttack();
+}
+
+void APMPCharacterAurora::MulticastAttack_Implementation()
+{
+	if (IsLocallyControlled() && !HasAuthority())
+		return;
+	
+	LocalAttack();
 }
 
 void APMPCharacterAurora::Skill_1()
@@ -47,4 +89,9 @@ void APMPCharacterAurora::Skill_1()
 void APMPCharacterAurora::Skill_2()
 {
 	Super::Skill_2();
+}
+
+void APMPCharacterAurora::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	IsActing = false;
 }

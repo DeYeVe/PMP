@@ -16,8 +16,8 @@ UPMPAnimInstance::UPMPAnimInstance()
 			Montage = MontageFinder.Object;
 		}
 	};
-
-	//InitMontage(TEXT("AnimMontage'/Game/Player/AM_PlayerFire.AM_PlayerFire'"), AuroraActionMontage);
+	
+	InitMontage(TEXT("AnimMontage'/Game/Player/Aurora/Animation/AM_Attack.AM_Attack'"), AuroraAttackMontage);
 }
 
 void UPMPAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -38,7 +38,13 @@ void UPMPAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 }
 
-void UPMPAnimInstance::PlayAuroraActionMontage()
+void UPMPAnimInstance::PlayAuroraAttackMontage(int32 Index)
 {
-	Montage_Play(AuroraActionMontage);
+	Montage_Play(AuroraAttackMontage, 1.f);
+	Montage_JumpToSection(FName(*FString::FromInt(Index)));
+}
+
+void UPMPAnimInstance::AnimNotify_Attack()
+{
+	UE_LOG(LogTemp, Warning, TEXT("delegate anim notify attack"));
 }

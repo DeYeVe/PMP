@@ -24,9 +24,28 @@ protected:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 public:
 	virtual void Attack() override;
-	virtual void Skill_1() override;
-	virtual void Skill_2() override;
+	UFUNCTION()
+	void LocalAttack();
+	UFUNCTION(Server, Reliable)
+	void ServerAttack();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAttack();
 	
+	virtual void Skill_1() override;
+	
+	virtual void Skill_2() override;
+
+	UFUNCTION()
+	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+private:
+	UPROPERTY(VisibleAnywhere, Replicated)
+	bool IsActing = false;
+
+	UPROPERTY()
+	int32 AttackIndex = 0;
 };

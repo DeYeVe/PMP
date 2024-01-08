@@ -29,6 +29,10 @@ APMPMonsterBear::APMPMonsterBear()
 	
 	AIControllerClass = APMPAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	Damage = 12;
+	MaxHP = 120;
+	CurHP = 120;
 }
 
 void APMPMonsterBear::BeginPlay()

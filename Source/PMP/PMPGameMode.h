@@ -18,6 +18,15 @@ public:
 	APMPGameMode();
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
+	
+	UPROPERTY()
+	TSubclassOf<UUserWidget> Widget;
+	UPROPERTY()
+	UUserWidget* CurWidget;
+
 };
 
 

@@ -4,6 +4,8 @@
 #include "PMPCharacter.h"
 #include "PMPCharacterAurora.h"
 #include "PMPCharacterFey.h"
+#include "PMPUserWidget.h"
+#include "Blueprint/UserWidget.h"
 #include "GameFramework/PlayerState.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -14,6 +16,19 @@ APMPGameMode::APMPGameMode()
 	
 	static ConstructorHelpers::FClassFinder<APawn> BPFey(TEXT("Blueprint'/Game/Player/BP_PMPCharacterFey.BP_PMPCharacterFey_C'"));
 	CharacterFeyClass = BPFey.Class;
+
+	// hud	
+	static ConstructorHelpers::FClassFinder<UPMPUserWidget> WidgetClassFinder(TEXT("'/Game/UI/WBP_Widget.WBP_Widget_C'"));
+
+	if(WidgetClassFinder.Succeeded())
+	{
+		Widget =  WidgetClassFinder.Class;
+		CurWidget = CreateWidget(GetWorld(), Widget);
+		if(CurWidget)
+		{
+			CurWidget->AddToViewport();
+		}
+	}
 }
 
 void APMPGameMode::PostLogin(APlayerController* NewPlayer)
@@ -38,4 +53,14 @@ void APMPGameMode::PostLogin(APlayerController* NewPlayer)
 			UE_LOG(LogTemp, Warning, TEXT("login 2p"));
 		}		
 	}
+}
+
+void APMPGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void APMPGameMode::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
 }

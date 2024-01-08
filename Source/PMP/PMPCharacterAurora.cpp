@@ -4,6 +4,8 @@
 #include "PMPCharacterAurora.h"
 
 #include "PMPAnimInstance.h"
+#include "Engine/DamageEvents.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 APMPCharacterAurora::APMPCharacterAurora()
@@ -20,6 +22,10 @@ APMPCharacterAurora::APMPCharacterAurora()
 	}
 
 	MeshCharacter->SetupAttachment(RootComponent);
+	
+	Damage = 35;
+	MaxHP = 200;
+	CurHP = 200;
 }
 
 void APMPCharacterAurora::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -66,6 +72,45 @@ void APMPCharacterAurora::LocalAttack()
 	AttackIndex = (AttackIndex + 1) % 3;
 	
 	IsActing = true;
+	
+	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+
+	TArray<FHitResult> HitResults;
+	FCollisionQueryParams Params(NAME_None, false, this);
+
+	float AttackRange = 100.f;
+	float AttackRadius = 80.f;
+
+	bool bResult = GetWorld()->SweepMultiByChannel(
+		OUT HitResults,
+		GetActorLocation(),
+		GetActorLocation() + GetActorForwardVector() * AttackRange,
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel5,
+		FCollisionShape::MakeSphere(AttackRadius),
+		Params);
+
+	FVector Vec = GetActorForwardVector() * AttackRange;
+	FVector Center = GetActorLocation() + Vec * 0.5f;
+	float HalfHeight = AttackRange * 0.5f + AttackRadius;
+	FQuat Rotation = FRotationMatrix::MakeFromZ(Vec).ToQuat();
+	FColor DrawColor;
+	if(bResult)
+		DrawColor = FColor::Green;
+	else
+		DrawColor = FColor::Red;
+	
+	DrawDebugCapsule(GetWorld(), Center, HalfHeight, AttackRadius, Rotation, DrawColor, false, 2.f);
+
+	for (auto HitResult : HitResults)
+	{
+		if (bResult && IsValid(HitResult.GetActor()))
+		{
+			FDamageEvent DamageEvent;
+			HitResult.GetActor()->TakeDamage(GetDamage(), DamageEvent, GetController(), this);
+		}
+	}
+	
 }
 
 void APMPCharacterAurora::ServerAttack_Implementation()

@@ -3,6 +3,7 @@
 
 #include "PMPMonster.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
 
 // Sets default values
 APMPMonster::APMPMonster()
@@ -13,13 +14,13 @@ APMPMonster::APMPMonster()
 	GetCapsuleComponent()->InitCapsuleSize(40.f, 50.0f);
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Monster"));
 	GetCapsuleComponent()->SetupAttachment(RootComponent);
-	
 }
 
 // Called when the game starts or when spawned
 void APMPMonster::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	
 }
 
@@ -40,6 +41,8 @@ void APMPMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 float APMPMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
+	TakenDamage = DamageAmount;
+	OnTakeDamageExecuted();
 	CurHP -= DamageAmount;
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);

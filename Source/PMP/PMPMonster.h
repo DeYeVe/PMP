@@ -35,6 +35,9 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	UPROPERTY(EditAnywhere)	
+	class APMPAIController* PMPAIController;
 
 	
 protected:
@@ -44,14 +47,25 @@ protected:
 	int32 MaxHP;
 	UPROPERTY()
 	int32 CurHP;
+	UPROPERTY()
+	int32 TakenDamage;
 	
 public:
 	UFUNCTION()
 	int32 GetDamage() const { return Damage; };
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
+	int32 GetTakenDamage() const { return TakenDamage; };
+	
+	UFUNCTION(BlueprintCallable)
+	int32 GetMaxHP() const { return MaxHP; };
+	
+	UFUNCTION(BlueprintCallable)
+	int32 GetCurHP() const { return CurHP; };
+	
+	UFUNCTION()	
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
-	UPROPERTY(EditAnywhere)	
-	class APMPAIController* PMPAIController;
+	UFUNCTION(BlueprintImplementableEvent, Category = "TakeDamage")
+	void OnTakeDamageExecuted();
 };

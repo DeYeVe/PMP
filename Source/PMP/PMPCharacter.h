@@ -107,12 +107,19 @@ protected:
 	int32 CurHP;
 	UPROPERTY()
 	int32 MaxHP;
+	UPROPERTY()
+	int32 Damage;
 
 	
 public:
-	int32 GetCurHP() const { return CurHP; };
-	
+	UFUNCTION()
+	int32 GetCurHP() const { return CurHP; };	
+	UFUNCTION()
 	void SetCurHP(int32 HP) { CurHP = HP; };
+	UFUNCTION()
+	int32 GetMaxHP() const { return MaxHP; };
+	UFUNCTION()
+	int32 GetDamage() const { return Damage; };
 
 public:
 	UFUNCTION()

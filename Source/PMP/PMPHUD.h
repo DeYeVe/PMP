@@ -13,5 +13,23 @@ UCLASS()
 class PMP_API APMPHUD : public AHUD
 {
 	GENERATED_BODY()
+
+public:
+	virtual void DrawHUD() override;
+
+	UPROPERTY(VisibleAnywhere)
+	class UPMPUserWidget* PlayerOverlay;
+	
+	UPROPERTY(EditAnywhere, Category = "Player Stats")
+	TSubclassOf<class UUserWidget> PlayerOverlayClass;
+	void AddPlayerOveray();
+
+protected:
+	virtual void BeginPlay() override;
+
+private:
+
+	UPROPERTY()
+	class APlayerController* OwningPlayer;
 	
 };

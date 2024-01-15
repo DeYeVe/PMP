@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "PMPGameMode.generated.h"
 
+#define DEBUG_FLAG true
+
 UCLASS(minimalapi)
 class APMPGameMode : public AGameModeBase
 {
@@ -13,6 +15,8 @@ class APMPGameMode : public AGameModeBase
 private:
 	TSubclassOf<APawn> CharacterAuroraClass;
 	TSubclassOf<APawn> CharacterFeyClass;
+	UPROPERTY()
+	class APMPPlayerController* NewPlayerController;
 	
 public:
 	APMPGameMode();
@@ -21,12 +25,6 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
-	
-	UPROPERTY()
-	TSubclassOf<UUserWidget> Widget;
-	UPROPERTY()
-	UUserWidget* CurWidget;
-
 };
 
 

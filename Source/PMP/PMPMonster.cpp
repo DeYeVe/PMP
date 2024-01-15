@@ -2,8 +2,12 @@
 
 
 #include "PMPMonster.h"
+
+#include "PMPAnimInstance.h"
+#include "Chaos/PBDRigidClustering.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 APMPMonster::APMPMonster()
@@ -21,7 +25,7 @@ void APMPMonster::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
+	AnimInstance = Cast<UPMPAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
 // Called every frame
@@ -38,12 +42,43 @@ void APMPMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 }
 
-float APMPMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
-	AActor* DamageCauser)
+void APMPMonster::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	TakenDamage = DamageAmount;
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APMPMonster, CurHP);
+	DOREPLIFETIME(APMPMonster, TakenDamage);
+}
+
+void APMPMonster::OnRep_HP(int32 LastHP)
+{
 	OnTakeDamageExecuted();
+}
+
+void APMPMonster::Hit()
+{
+}
+
+void APMPMonster::Attack()
+{
+}
+
+void APMPMonster::Die()
+{
+}
+
+float APMPMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+                              AActor* DamageCauser)
+{
+	if (!HasAuthority())
+		return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);;
+	
+	TakenDamage = DamageAmount;
 	CurHP -= DamageAmount;
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+void APMPMonster::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
 }

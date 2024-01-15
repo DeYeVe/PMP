@@ -4,6 +4,7 @@
 #include "PMPMonsterWolf.h"
 
 #include "PMPAIController.h"
+#include "PMPAnimInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -29,6 +30,10 @@ APMPMonsterWolf::APMPMonsterWolf()
 	
 	AIControllerClass = APMPAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	
+	Damage = 10;
+	MaxHP = 100;
+	CurHP = 100;
 }
 
 void APMPMonsterWolf::BeginPlay()
@@ -44,4 +49,34 @@ void APMPMonsterWolf::Tick(float DeltaTime)
 void APMPMonsterWolf::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+void APMPMonsterWolf::OnRep_HP(int32 LastHP)
+{
+	Super::OnRep_HP(LastHP);
+}
+
+void APMPMonsterWolf::Hit()
+{
+	Super::Hit();
+}
+
+void APMPMonsterWolf::Attack()
+{
+	Super::Attack();
+}
+
+void APMPMonsterWolf::Die()
+{
+	Super::Die();
+}
+
+void APMPMonsterWolf::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	Super::OnAttackMontageEnded(Montage, bInterrupted);
+
+	/*if (Montage != AnimInstance->WolfAttackMontage)
+		return;*/
+	
+	OnAttackEnd.Broadcast();
 }

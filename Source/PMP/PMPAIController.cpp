@@ -2,40 +2,42 @@
 
 
 #include "PMPAIController.h"
-
 #include "NavigationSystem.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardData.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 APMPAIController::APMPAIController()
 {
+	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BT(TEXT("BehaviorTree'/Game/Enemies/AI/BT_Enemy.BT_Enemy'"));
+	if (BT.Succeeded())
+	{
+		EnemyBehaviorTree = BT.Object;
+	}
+	
+	static ConstructorHelpers::FObjectFinder<UBlackboardData> BD(TEXT("BlackboardData'/Game/Enemies/AI/BB_Enemy.BB_Enemy'"));
+	if (BD.Succeeded())
+	{
+		EnemyBlackboardData = BD.Object;
+	}
 }
 
 void APMPAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &APMPAIController::MoveRandom, 5.f, true);
+	
+	UBlackboardComponent* BlackboardComp = Blackboard.Get();
+	if(UseBlackboard(EnemyBlackboardData, BlackboardComp))
+	{
+		if(RunBehaviorTree(EnemyBehaviorTree))
+		{
+		}
+	}
+	this->Blackboard = BlackboardComp;
 }
 
 void APMPAIController::OnUnPossess()
 {
 	Super::OnUnPossess();
-
-	GetWorldTimerManager().ClearTimer(TimerHandle);
-}
-
-void APMPAIController::MoveRandom()
-{
-	auto CurPawn = GetPawn();
-
-	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(GetWorld());
-	if (NavSystem == nullptr)
-		return;
-
-	FNavLocation RandomLocation;
-
-	if (NavSystem->GetRandomPointInNavigableRadius(FVector::ZeroVector, 600.f, RandomLocation))
-	{
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this,RandomLocation);
-	}
 }

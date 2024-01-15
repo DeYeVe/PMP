@@ -99,16 +99,21 @@ protected:
 	UPROPERTY()
 	class UPMPAnimInstance* AnimInstance;
 
+	UPROPERTY()
+	class APMPPlayerController* PMPPlayerController;
 public:
 	FVector2D GetMovementVector() const { return MovementVector; }
 	
 protected:
-	UPROPERTY()
+	UPROPERTY(ReplicatedUsing = OnRep_HP, EditAnywhere, Category = "Player Stats")
 	int32 CurHP;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Player Stats")
 	int32 MaxHP;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Player Stats")
 	int32 Damage;
+	
+	UFUNCTION(BlueprintCallable)
+	void OnRep_HP(int32 LastHP);
 
 	
 public:
@@ -122,6 +127,10 @@ public:
 	int32 GetDamage() const { return Damage; };
 
 public:
+	void UpdateHUDHP();
+	void UpdateHUDSkill_1();
+
+public:
 	UFUNCTION()
 	virtual void Attack();
 	
@@ -130,5 +139,8 @@ public:
 	
 	UFUNCTION()
 	virtual void Skill_2();
+
+	UFUNCTION()
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 };
 

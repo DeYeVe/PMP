@@ -11,6 +11,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "PMPAnimInstance.h"
+#include "PMPPlayerController.h"
+#include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -80,6 +82,7 @@ void APMPCharacter::Tick(float DeltaSeconds)
 void APMPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(APMPCharacter, CurHP);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -151,6 +154,29 @@ void APMPCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void APMPCharacter::OnRep_HP(int32 LastHP)
+{
+	UpdateHUDHP();
+	if (CurHP < LastHP)
+	{
+		//play hit
+	}
+		
+}
+
+void APMPCharacter::UpdateHUDHP()
+{
+	PMPPlayerController = IsValid(PMPPlayerController) ? PMPPlayerController : Cast<APMPPlayerController>(Controller);
+	if (PMPPlayerController)
+	{
+		PMPPlayerController->SetHUDHP(CurHP, MaxHP);
+	}
+}
+
+void APMPCharacter::UpdateHUDSkill_1()
+{
+}
+
 void APMPCharacter::Attack()
 {
 }
@@ -161,4 +187,15 @@ void APMPCharacter::Skill_1()
 
 void APMPCharacter::Skill_2()
 {
+}
+
+float APMPCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{	
+	if (!HasAuthority())
+		return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);;
+	
+	CurHP -= DamageAmount;
+	
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }

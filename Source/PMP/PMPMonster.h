@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "PMPMonster.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnAttackEnd);
+
 UCLASS()
 class PMP_API APMPMonster : public ACharacter
 {
@@ -23,7 +25,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UPMPAnimInstance* AnimInstance;
 	
-	USkeletalMeshComponent* GetMeshMonster() const { return MeshMonster; }
+	USkeletalMeshComponent* GetMesh() const { return MeshMonster; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -35,21 +37,25 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	UPROPERTY(EditAnywhere)	
 	class APMPAIController* PMPAIController;
 
 	
 protected:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Monster Stats")
 	int32 Damage;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Monster Stats")
 	int32 MaxHP;
-	UPROPERTY()
+	UPROPERTY(ReplicatedUsing = OnRep_HP, EditAnywhere, Category = "Monster Stats")
 	int32 CurHP;
-	UPROPERTY()
+	UFUNCTION(BlueprintCallable)
+	virtual void OnRep_HP(int32 LastHP);
+	UPROPERTY(Replicated)
 	int32 TakenDamage;
-	
+
 public:
 	UFUNCTION()
 	int32 GetDamage() const { return Damage; };
@@ -62,10 +68,27 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	int32 GetCurHP() const { return CurHP; };
+
+public:
+	UFUNCTION()
+	virtual void Hit();
+	UFUNCTION()
+	virtual void Attack();
+	UFUNCTION()
+	virtual void Die();
 	
 	UFUNCTION()	
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "TakeDamage")
 	void OnTakeDamageExecuted();
+
+	UPROPERTY(Replicated)
+	bool IsActing;
+	
+	FOnAttackEnd OnAttackEnd;
+	
+	UFUNCTION()
+	virtual void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
 };

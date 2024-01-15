@@ -4,6 +4,7 @@
 #include "PMPCharacterAurora.h"
 
 #include "PMPAnimInstance.h"
+#include "PMPGameMode.h"
 #include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -38,6 +39,7 @@ void APMPCharacterAurora::BeginPlay()
 	Super::BeginPlay();
 
 	AnimInstance->OnMontageEnded.AddDynamic(this, &APMPCharacterAurora::OnAttackMontageEnded);
+	AnimInstance->OnAuroraAttack.AddUObject(this, &APMPCharacterAurora::CheckAttack);
 }
 
 void APMPCharacterAurora::Tick(float DeltaSeconds)
@@ -55,62 +57,23 @@ void APMPCharacterAurora::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 void APMPCharacterAurora::Attack()
 {
 	Super::Attack();
+	
+	if(IsActing)
+		return;
 
 	if (!HasAuthority())
 		LocalAttack();
 	
 	ServerAttack();
+	
+	IsActing = true;	
 }
 
 void APMPCharacterAurora::LocalAttack()
-{	
-	if(IsActing)
-		return;
-	
+{		
 	AnimInstance->PlayAuroraAttackMontage(AttackIndex);
 	
-	AttackIndex = (AttackIndex + 1) % 3;
-	
-	IsActing = true;
-	
-	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-
-	TArray<FHitResult> HitResults;
-	FCollisionQueryParams Params(NAME_None, false, this);
-
-	float AttackRange = 100.f;
-	float AttackRadius = 80.f;
-
-	bool bResult = GetWorld()->SweepMultiByChannel(
-		OUT HitResults,
-		GetActorLocation(),
-		GetActorLocation() + GetActorForwardVector() * AttackRange,
-		FQuat::Identity,
-		ECollisionChannel::ECC_GameTraceChannel5,
-		FCollisionShape::MakeSphere(AttackRadius),
-		Params);
-
-	FVector Vec = GetActorForwardVector() * AttackRange;
-	FVector Center = GetActorLocation() + Vec * 0.5f;
-	float HalfHeight = AttackRange * 0.5f + AttackRadius;
-	FQuat Rotation = FRotationMatrix::MakeFromZ(Vec).ToQuat();
-	FColor DrawColor;
-	if(bResult)
-		DrawColor = FColor::Green;
-	else
-		DrawColor = FColor::Red;
-	
-	DrawDebugCapsule(GetWorld(), Center, HalfHeight, AttackRadius, Rotation, DrawColor, false, 2.f);
-
-	for (auto HitResult : HitResults)
-	{
-		if (bResult && IsValid(HitResult.GetActor()))
-		{
-			FDamageEvent DamageEvent;
-			HitResult.GetActor()->TakeDamage(GetDamage(), DamageEvent, GetController(), this);
-		}
-	}
-	
+	AttackIndex = (AttackIndex + 1) % 3;	
 }
 
 void APMPCharacterAurora::ServerAttack_Implementation()
@@ -126,6 +89,48 @@ void APMPCharacterAurora::MulticastAttack_Implementation()
 	LocalAttack();
 }
 
+void APMPCharacterAurora::CheckAttack()
+{
+	TArray<FHitResult> HitResults;
+	FCollisionQueryParams Params(NAME_None, false, this);
+
+	float AttackRange = 100.f;
+	float AttackRadius = 80.f;
+
+	bool bResult = GetWorld()->SweepMultiByChannel(
+		OUT HitResults,
+		GetActorLocation(),
+		GetActorLocation() + GetActorForwardVector() * AttackRange,
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel2,
+		FCollisionShape::MakeSphere(AttackRadius),
+		Params);
+
+	if (DEBUG_FLAG)
+	{		
+		FVector Vec = GetActorForwardVector() * AttackRange;
+		FVector Center = GetActorLocation() + Vec * 0.5f;
+		float HalfHeight = AttackRange * 0.5f + AttackRadius;
+		FQuat Rotation = FRotationMatrix::MakeFromZ(Vec).ToQuat();
+		FColor DrawColor;
+		if(bResult)
+			DrawColor = FColor::Green;
+		else
+			DrawColor = FColor::Red;
+	
+		DrawDebugCapsule(GetWorld(), Center, HalfHeight, AttackRadius, Rotation, DrawColor, false, 2.f);
+	}
+
+	for (auto HitResult : HitResults)
+	{
+		if (bResult && IsValid(HitResult.GetActor()))
+		{
+			FDamageEvent DamageEvent;
+			HitResult.GetActor()->TakeDamage(GetDamage(), DamageEvent, GetController(), this);
+		}
+	}
+}
+
 void APMPCharacterAurora::Skill_1()
 {
 	Super::Skill_1();
@@ -138,5 +143,8 @@ void APMPCharacterAurora::Skill_2()
 
 void APMPCharacterAurora::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
+	if(Montage != AnimInstance->AuroraAttackMontage)
+		return;
+	
 	IsActing = false;
 }

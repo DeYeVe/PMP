@@ -6,6 +6,8 @@
 #include "Animation/AnimInstance.h"
 #include "PMPAnimInstance.generated.h"
 
+
+DECLARE_MULTICAST_DELEGATE(FOnAttack);
 /**
  * 
  */
@@ -21,14 +23,29 @@ public:
 
 public:
 	void PlayAuroraAttackMontage(int32 Index);
+	
+	void PlayBearAttackMontage();
+	void PlayBearHitMontage();
+	void PlayBearDieMontage();
 
 private:
 	UFUNCTION()
-	void AnimNotify_Attack();
+	void AnimNotify_AuroraAttack() const;
 	
-private:
+	UFUNCTION()
+	void AnimNotify_BearAttack() const;
+	
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Aurora, Meta=(AllowPrivateAccess=true)) \
 	UAnimMontage* AuroraAttackMontage;
+
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=EnemyBear, Meta=(AllowPrivateAccess=true)) \
+	UAnimMontage* BearAttackMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=EnemyBear, Meta=(AllowPrivateAccess=true)) \
+	UAnimMontage* BearDieMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=EnemyBear, Meta=(AllowPrivateAccess=true)) \
+	UAnimMontage* BearHitMontage;
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
@@ -39,4 +56,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
 	FVector2D MovementVector;
+
+public:
+	FOnAttack OnAuroraAttack;
+	FOnAttack OnBearAttack;
 };

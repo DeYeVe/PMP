@@ -34,6 +34,8 @@ public:
 	void ServerAttack();
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastAttack();
+	UFUNCTION()
+	void CheckAttack();
 	
 	virtual void Skill_1() override;
 	
@@ -48,4 +50,5 @@ private:
 
 	UPROPERTY()
 	int32 AttackIndex = 0;
+	
 };

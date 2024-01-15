@@ -17,6 +17,10 @@ APMPCharacterFey::APMPCharacterFey()
 	}
 
 	MeshCharacter->SetupAttachment(RootComponent);
+	
+	Damage = 25;
+	MaxHP = 200;
+	CurHP = 200;
 }
 
 void APMPCharacterFey::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

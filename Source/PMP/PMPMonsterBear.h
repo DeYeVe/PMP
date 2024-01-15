@@ -28,4 +28,21 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+public:
+	virtual void OnRep_HP(int32 LastHP) override;
+	
+	virtual void Hit() override;
+	virtual void Attack() override;
+	UFUNCTION()
+	void LocalAttack();
+	UFUNCTION(Server, Reliable)
+	void ServerAttack();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAttack();
+	UFUNCTION()
+	void CheckAttack();
+	
+	virtual void Die() override;
+
+	virtual void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
 };

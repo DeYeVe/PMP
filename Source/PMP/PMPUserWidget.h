@@ -14,19 +14,13 @@ class PMP_API UPMPUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
-public:
-	/*
-	UPROPERTY(meta=(BindWidget))
-	FVector2D EnemyPos;*/
-	
+public:	
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* HPBar;
 
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* HPText;
-	
-	/*
-	UFUNCTION()
-	void SetCurAmmo(FString str) { CurAmmo->SetText(FText::FromString(str)); };*/
+	class UTextBlock* CurHPText;
 
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* MaxHPText;
 };

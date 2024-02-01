@@ -66,17 +66,8 @@ void APMPMonsterWolf::Attack()
 	Super::Attack();
 }
 
-void APMPMonsterWolf::Die()
+void APMPMonsterWolf::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	Super::Die();
-}
-
-void APMPMonsterWolf::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
-{
-	Super::OnAttackMontageEnded(Montage, bInterrupted);
-
-	/*if (Montage != AnimInstance->WolfAttackMontage)
-		return;*/
-	
+	Super::OnMontageEnded(Montage, bInterrupted);	
 	OnAttackEnd.Broadcast();
 }

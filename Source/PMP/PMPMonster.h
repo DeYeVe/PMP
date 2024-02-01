@@ -7,6 +7,17 @@
 #include "PMPMonster.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnAttackEnd);
+DECLARE_MULTICAST_DELEGATE(FOnHitEnd);
+
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class EEnemyStateFlags : uint8
+{
+	SLOW = 1 << 1,
+	FROZEN = 1 << 2,
+	TRASH = 0
+};
+
+ENUM_CLASS_FLAGS(EEnemyStateFlags);
 
 UCLASS()
 class PMP_API APMPMonster : public ACharacter
@@ -20,6 +31,7 @@ public:
 protected:	
 	UPROPERTY(VisibleAnywhere, Category=Mesh)
 	USkeletalMeshComponent* MeshMonster;
+	UMaterialInterface* OriginalMaterial;
 	
 public:	
 	UPROPERTY(EditAnywhere)
@@ -45,6 +57,8 @@ public:
 
 	
 protected:
+	UPROPERTY(VisibleAnywhere, Category = "Monster Stats")
+	EEnemyStateFlags eStatesFlag;
 	UPROPERTY(EditAnywhere, Category = "Monster Stats")
 	int32 Damage;
 	UPROPERTY(EditAnywhere, Category = "Monster Stats")
@@ -69,6 +83,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetCurHP() const { return CurHP; };
 
+	
+
 public:
 	UFUNCTION()
 	virtual void Hit();
@@ -79,6 +95,10 @@ public:
 	
 	UFUNCTION()	
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	UFUNCTION()
+	virtual void SetFrozen();
+	UFUNCTION()
+	bool GetFrozen() const { return EnumHasAnyFlags(eStatesFlag, EEnemyStateFlags::FROZEN); };
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "TakeDamage")
 	void OnTakeDamageExecuted();
@@ -87,8 +107,9 @@ public:
 	bool IsActing;
 	
 	FOnAttackEnd OnAttackEnd;
+	FOnHitEnd OnHitEnd;
 	
 	UFUNCTION()
-	virtual void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	virtual void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 };

@@ -11,7 +11,10 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "PMPAnimInstance.h"
+#include "PMPGameMode.h"
+#include "PMPMonster.h"
 #include "PMPPlayerController.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -77,6 +80,63 @@ void APMPCharacter::BeginPlay()
 void APMPCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	if (EnumHasAnyFlags(eStatesFlag, EStateFlags::FOCUSING))
+	{
+		float SearchRadius = 1200.f;
+		TArray<FOverlapResult> OverlapResults;
+		FCollisionQueryParams QueryParams(NAME_None, false);
+
+		bool bResult = GetWorld()->OverlapMultiByChannel(
+			OverlapResults,
+			GetActorLocation(),
+			FQuat::Identity,
+			ECollisionChannel::ECC_GameTraceChannel2,
+			FCollisionShape::MakeSphere(SearchRadius),
+			QueryParams);
+
+		if (bResult)
+		{
+			if (!OverlapResults.IsEmpty())
+			{
+				APMPMonster* PMPMonster = nullptr;
+				float MinDistance = 0.f;
+            		
+				for (auto& OverlapResult : OverlapResults)
+				{
+					if (PMPMonster == nullptr)
+					{
+						PMPMonster = Cast<APMPMonster>(OverlapResult.GetActor());
+						MinDistance = GetDistanceTo(PMPMonster);
+					}
+					else if (MinDistance > GetDistanceTo(Cast<APMPMonster>(OverlapResult.GetActor())))
+					{
+						PMPMonster = Cast<APMPMonster>(OverlapResult.GetActor());
+						MinDistance = GetDistanceTo(PMPMonster);
+					}
+				}
+				if(DEBUG_FLAG)	
+					DrawDebugSphere(GetWorld(), GetActorLocation(), SearchRadius, 16, FColor::Green, false, 0.2f);
+			
+				// Focusing
+
+				FVector Target = PMPMonster->GetActorLocation();
+				float Dist = GetDistanceTo(PMPMonster);
+				Target.Z -= Dist / FMath::Sqrt(3.f);
+				FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Target);
+				FRotator NewRotation = FMath::RInterpTo(GetControlRotation(), LookAtRotation, DeltaSeconds, 10.0f);
+				GetController()->SetControlRotation(NewRotation);
+				return;
+			}
+			if(DEBUG_FLAG)	
+				DrawDebugSphere(GetWorld(), GetActorLocation(), SearchRadius, 16, FColor::Red, false, 0.2f);
+		}
+		else
+		{
+			if(DEBUG_FLAG)	
+				DrawDebugSphere(GetWorld(), GetActorLocation(), SearchRadius, 16, FColor::Red, false, 0.2f);
+		}
+	}
 }
 
 void APMPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -111,6 +171,12 @@ void APMPCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		
 		// Skill 2
 		EnhancedInputComponent->BindAction(SkillAction_2, ETriggerEvent::Triggered, this, &APMPCharacter::Skill_2);
+
+		// Skill 3
+		EnhancedInputComponent->BindAction(SkillAction_3, ETriggerEvent::Triggered, this, &APMPCharacter::Skill_3);
+
+		// Toggle Focusing
+		EnhancedInputComponent->BindAction(ToggleFocusingAction, ETriggerEvent::Triggered, this, &APMPCharacter::ToggleFocusing);
 	}
 	else
 	{
@@ -156,12 +222,6 @@ void APMPCharacter::Look(const FInputActionValue& Value)
 
 void APMPCharacter::OnRep_HP(int32 LastHP)
 {
-	UpdateHUDHP();
-	if (CurHP < LastHP)
-	{
-		//play hit
-	}
-		
 }
 
 void APMPCharacter::UpdateHUDHP()
@@ -189,13 +249,33 @@ void APMPCharacter::Skill_2()
 {
 }
 
-float APMPCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
-	AActor* DamageCauser)
-{	
-	if (!HasAuthority())
-		return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);;
+void APMPCharacter::Skill_3()
+{
+}
+
+void APMPCharacter::StartSkillCooldown(int32 SkillIndex)
+{
+	auto OnSkillCooldownFinishedLambda = [this, SkillIndex]()
+	{
+		IsSkillOnCooldown[SkillIndex] = false;
+	};
 	
+	GetWorldTimerManager().SetTimer(SkillCooldownTimerHandles[SkillIndex], OnSkillCooldownFinishedLambda, SkillCooldown[SkillIndex], false);
+	IsSkillOnCooldown[SkillIndex] = true;
+}
+
+void APMPCharacter::ToggleFocusing()
+{
+	UE_LOG(LogTemp, Warning, TEXT("toggle focusing"));
+	eStatesFlag ^= EStateFlags::FOCUSING;
+}
+
+float APMPCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+                                AActor* DamageCauser)
+{	
 	CurHP -= DamageAmount;
+	UpdateHUDHP();
+	UE_LOG(LogTemp, Warning, TEXT("take damage %d"), CurHP);
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }

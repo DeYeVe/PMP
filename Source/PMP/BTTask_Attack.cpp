@@ -21,6 +21,11 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	PMPMonster->Attack();
 	bIsAttacking = true;
 
+
+	PMPMonster->OnHitEnd.AddLambda([this]()
+		{
+			bIsAttacking = false;
+		});
 	PMPMonster->OnAttackEnd.AddLambda([this]()
 		{
 			bIsAttacking = false;

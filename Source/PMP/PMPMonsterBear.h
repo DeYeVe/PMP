@@ -33,16 +33,30 @@ public:
 	
 	virtual void Hit() override;
 	virtual void Attack() override;
+	virtual void Die() override;
+
+	UFUNCTION()
+	void LocalHit();
+	UFUNCTION(Server, Reliable)
+	void ServerHit();	
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastHit();
+	
 	UFUNCTION()
 	void LocalAttack();
 	UFUNCTION(Server, Reliable)
-	void ServerAttack();
+	void ServerAttack();	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastAttack();
 	UFUNCTION()
 	void CheckAttack();
 	
-	virtual void Die() override;
+	UFUNCTION()
+	virtual void LocalDie();
+	UFUNCTION(Server, Reliable)
+	void ServerDie();	
+	UFUNCTION(NetMulticast, Reliable)
+	virtual void MulticastDie();	
 
-	virtual void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
+	virtual void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
 };

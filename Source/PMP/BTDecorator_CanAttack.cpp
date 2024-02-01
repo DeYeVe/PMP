@@ -7,6 +7,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "DrawDebugHelpers.h"
 #include "PMPGameMode.h"
+#include "PMPMonster.h"
 
 
 UBTDecorator_CanAttack::UBTDecorator_CanAttack()
@@ -26,5 +27,9 @@ bool UBTDecorator_CanAttack::CalculateRawConditionValue(UBehaviorTreeComponent& 
 	if (Target == nullptr)
 		return false;
 
+	if (CurrentPawn->IsA(APMPMonster::StaticClass()))
+		if (Cast<APMPMonster>(CurrentPawn)->GetFrozen())
+			return false;
+	
 	return bResult && Target->GetDistanceTo(CurrentPawn) <= 300.f;
 }

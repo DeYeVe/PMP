@@ -32,7 +32,9 @@ APMPMonsterBear::APMPMonsterBear()
 	
 	AIControllerClass = APMPAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	PMPAIController = Cast<APMPAIController>(GetController());
 
+	
 	Damage = 12;
 	MaxHP = 120;
 	CurHP = 120;
@@ -42,8 +44,11 @@ void APMPMonsterBear::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AnimInstance->OnMontageEnded.AddDynamic(this, &APMPMonsterBear::OnAttackMontageEnded);
+	AnimInstance->OnMontageEnded.AddDynamic(this, &APMPMonsterBear::OnMontageEnded);
 	AnimInstance->OnBearAttack.AddUObject(this, &APMPMonsterBear::CheckAttack);
+
+	AController* MonsterController = GetWorld()->GetFirstPlayerController();
+	SetOwner(MonsterController);
 }
 
 void APMPMonsterBear::Tick(float DeltaTime)
@@ -59,23 +64,19 @@ void APMPMonsterBear::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 void APMPMonsterBear::OnRep_HP(int32 LastHP)
 {
 	Super::OnRep_HP(LastHP);
-
-	if (CurHP <= 0)
-	{
-		Die();
-		return;
-	}
-	if (CurHP < LastHP)
-	{
-		Hit();
-	}
 }
 
 void APMPMonsterBear::Hit()
 {
 	Super::Hit();
 
-	AnimInstance->PlayBearHitMontage();
+	if(IsActing)
+		return;
+	
+	if (!HasAuthority())
+		LocalHit();
+	
+	ServerHit();
 }
 
 void APMPMonsterBear::Attack()
@@ -84,15 +85,45 @@ void APMPMonsterBear::Attack()
 
 	if(IsActing)
 		return;
-	
-	UE_LOG(LogTemp, Warning, TEXT("BearAttack"));
 
 	if (!HasAuthority())
 		LocalAttack();
 	
 	ServerAttack();
+}
+
+void APMPMonsterBear::Die()
+{
+	Super::Die();
+
+	if(IsActing)
+		return;
+
+	if (!HasAuthority())
+		LocalDie();
 	
-	IsActing = true;
+	ServerDie();
+}
+
+void APMPMonsterBear::LocalHit()
+{
+	if(EnumHasAnyFlags(eStatesFlag, EEnemyStateFlags::FROZEN))
+		return;
+	
+	AnimInstance->PlayBearHitMontage();
+}
+
+void APMPMonsterBear::ServerHit_Implementation()
+{
+	MulticastHit();
+}
+
+void APMPMonsterBear::MulticastHit_Implementation()
+{
+	if (IsLocallyControlled() && !HasAuthority())
+		return;
+	
+	LocalHit();
 }
 
 void APMPMonsterBear::LocalAttack()
@@ -108,7 +139,7 @@ void APMPMonsterBear::ServerAttack_Implementation()
 void APMPMonsterBear::MulticastAttack_Implementation()
 {
 	if (IsLocallyControlled() && !HasAuthority())
-	return;
+		return;
 	
 	LocalAttack();
 }
@@ -137,14 +168,9 @@ void APMPMonsterBear::CheckAttack()
  		FVector Center = GetActorLocation() + Vec * 0.5f + Offset;
  		float HalfHeight = AttackRange * 0.5f + AttackRadius;
  		FQuat Rotation = FRotationMatrix::MakeFromZ(Vec).ToQuat();
- 		FColor DrawColor;
- 		if(bResult)
- 			DrawColor = FColor::Green;
- 		else
- 			DrawColor = FColor::Red;
- 	
- 		DrawDebugCapsule(GetWorld(), Center, HalfHeight, AttackRadius, Rotation, DrawColor, false, 2.f);
- 	}
+ 		
+		DrawDebugCapsule(GetWorld(), Center, HalfHeight, AttackRadius, Rotation, bResult ? FColor::Green : FColor::Red, false, 2.f);
+}
  
  	for (auto HitResult : HitResults)
  	{
@@ -156,18 +182,47 @@ void APMPMonsterBear::CheckAttack()
  	}
 }
 
-void APMPMonsterBear::Die()
+void APMPMonsterBear::LocalDie()
 {
-	Super::Die();
+	IsActing = true;
+	AnimInstance->IsActing = true;
+	AnimInstance->PlayBearDieMontage();
+	if(PMPAIController)
+		PMPAIController->Destroy();
 }
 
-void APMPMonsterBear::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+void APMPMonsterBear::ServerDie_Implementation()
 {
-	Super::OnAttackMontageEnded(Montage, bInterrupted);
+	MulticastDie();
+}
 
-	if (Montage != AnimInstance->BearAttackMontage)
+void APMPMonsterBear::MulticastDie_Implementation()
+{
+	if (IsLocallyControlled() && !HasAuthority())
 		return;
-	
-	IsActing = false;
-	OnAttackEnd.Broadcast();
+	LocalDie();
+}
+
+void APMPMonsterBear::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	Super::OnMontageEnded(Montage, bInterrupted);
+
+	if (Montage == AnimInstance->BearAttackMontage)
+	{
+		OnAttackEnd.Broadcast();
+		return;
+	}
+	else if (Montage == AnimInstance->BearHitMontage)
+	{
+		OnHitEnd.Broadcast();
+		return;		
+	}
+	else if (Montage == AnimInstance->BearDieMontage)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("bear die end"));
+		Destroy();
+		return;
+	}
+
+	return;
 }

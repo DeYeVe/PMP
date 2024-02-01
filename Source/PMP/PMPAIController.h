@@ -22,12 +22,10 @@ public:
 
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;
-
 private:
 	UPROPERTY()
 	class UBehaviorTree* EnemyBehaviorTree;
 
 	UPROPERTY()
-	class UBlackboardData* EnemyBlackboardData;
-	
+	class UBlackboardData* EnemyBlackboardData;	
 };

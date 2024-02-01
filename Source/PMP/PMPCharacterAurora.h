@@ -38,17 +38,55 @@ public:
 	void CheckAttack();
 	
 	virtual void Skill_1() override;
+	UFUNCTION()
+	void LocalSkill_1();
+	UFUNCTION(Server, Reliable)
+	void ServerSkill_1();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSkill_1();
+	UFUNCTION()
+	void CheckSkill_1();
 	
-	virtual void Skill_2() override;
+	virtual void Skill_2() override;	
+	UFUNCTION()
+	void LocalSkill_2();
+	UFUNCTION(Server, Reliable)
+	void ServerSkill_2();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSkill_2();
+	UFUNCTION()
+	void CheckSkill_2();
+	
+	virtual void Skill_3() override;
+	UFUNCTION()
+	void LocalSkill_3();
+	UFUNCTION(Server, Reliable)
+	void ServerSkill_3();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSkill_3();
+	UFUNCTION()
+	void CheckSkill_3();
 
 	UFUNCTION()
 	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 private:
-	UPROPERTY(VisibleAnywhere, Replicated)
-	bool IsActing = false;
-
 	UPROPERTY()
 	int32 AttackIndex = 0;
+
+	UPROPERTY()
+	float Skill_3Offset;
+
+private:
+	UPROPERTY()
+	UParticleSystem* SKill_1FX;
+	UPROPERTY()
+	UParticleSystem* SKill_2FX;
+	UPROPERTY()
+	UParticleSystem* SKill_3FX_1;
+	UPROPERTY()
+	UParticleSystem* SKill_3FX_2;
+	UPROPERTY()
+	UParticleSystem* SKill_3FX_3;
 	
 };

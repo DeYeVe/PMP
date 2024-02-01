@@ -33,8 +33,7 @@ public:
 	
 	virtual void Hit() override;
 	virtual void Attack() override;
-	virtual void Die() override;
 
-	virtual void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
+	virtual void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
 	
 };

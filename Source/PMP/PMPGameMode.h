@@ -14,7 +14,7 @@ class APMPGameMode : public AGameModeBase
 	GENERATED_BODY()
 private:
 	TSubclassOf<APawn> CharacterAuroraClass;
-	TSubclassOf<APawn> CharacterFeyClass;
+	TSubclassOf<APawn> CharacterMurielClass;
 	UPROPERTY()
 	class APMPPlayerController* NewPlayerController;
 	

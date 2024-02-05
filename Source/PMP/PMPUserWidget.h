@@ -23,4 +23,28 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* MaxHPText;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UCanvasPanel* AuroraSkill;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UCanvasPanel* MurielSkill;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* AuroraSkill1;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* AuroraSkill2;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* AuroraSkill3;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* MurielSkill1;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* MurielSkill2;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* MurielSkill3;
 };

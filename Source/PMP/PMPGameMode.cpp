@@ -1,12 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "PMPGameMode.h"
-#include "PMPCharacter.h"
 #include "PMPCharacterAurora.h"
-#include "PMPCharacterFey.h"
+#include "PMPCharacterMuriel.h"
 #include "PMPPlayerController.h"
-#include "PMPUserWidget.h"
-#include "Blueprint/UserWidget.h"
 #include "GameFramework/PlayerState.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -15,8 +12,8 @@ APMPGameMode::APMPGameMode()
 	static ConstructorHelpers::FClassFinder<APawn> BPAurora(TEXT("Blueprint'/Game/Player/BP_PMPCharacterAurora.BP_PMPCharacterAurora_C'"));
 	CharacterAuroraClass = BPAurora.Class;
 	
-	static ConstructorHelpers::FClassFinder<APawn> BPFey(TEXT("Blueprint'/Game/Player/BP_PMPCharacterFey.BP_PMPCharacterFey_C'"));
-	CharacterFeyClass = BPFey.Class;
+	static ConstructorHelpers::FClassFinder<APawn> BPMuriel(TEXT("Blueprint'/Game/Player/BP_PMPCharacterMuriel.BP_PMPCharacterMuriel_C'"));
+	CharacterMurielClass = BPMuriel.Class;
 	
 }
 
@@ -36,9 +33,9 @@ void APMPGameMode::PostLogin(APlayerController* NewPlayer)
 	}
 	else if (NewPlayerController->GetPlayerState<APlayerState>() && (NewPlayerController->GetPlayerState<APlayerState>()->GetPlayerId() - 256) % 2  == 1)
 	{
-		if (CharacterFeyClass != NULL)
+		if (CharacterMurielClass != NULL)
 		{
-			APMPCharacterFey* NewCharacter = GetWorld()->SpawnActor<APMPCharacterFey>(CharacterFeyClass, FVector(0.f, 100.0f, 96.0f), FRotator());
+			APMPCharacterMuriel* NewCharacter = GetWorld()->SpawnActor<APMPCharacterMuriel>(CharacterMurielClass, FVector(0.f, 100.0f, 96.0f), FRotator());
 			NewPlayerController->Possess(NewCharacter);
 			UE_LOG(LogTemp, Warning, TEXT("login 2p"));
 		}		

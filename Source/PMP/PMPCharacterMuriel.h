@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "PMPCharacter.h"
-#include "PMPCharacterFey.generated.h"
+#include "PMPCharacterMuriel.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PMP_API APMPCharacterFey : public APMPCharacter
+class PMP_API APMPCharacterMuriel : public APMPCharacter
 {
 	GENERATED_BODY()
 
 public:
-	APMPCharacterFey();
+	APMPCharacterMuriel();
 	
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

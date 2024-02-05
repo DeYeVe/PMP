@@ -1,15 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PMPCharacterFey.h"
+#include "PMPCharacterMuriel.h"
 
-APMPCharacterFey::APMPCharacterFey()
+APMPCharacterMuriel::APMPCharacterMuriel()
 {
-	MeshCharacter = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshFey"));
+	MeshCharacter = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshMuriel"));
 	MeshCharacter->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 	MeshCharacter->SetRelativeLocation(FVector(0.f, 0.f, -96.f));
 	
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> SM(TEXT("SkeletalMesh'/Game/ParagonFey/Characters/Heroes/Fey/Meshes/Fey_GDC.Fey_GDC'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> SM(TEXT("SkeletalMesh'/Game/ParagonMuriel/Characters/Heroes/Muriel/Meshes/Muriel_GDC.Muriel_GDC'"));
 
 	if (SM.Succeeded())
 	{
@@ -23,17 +23,17 @@ APMPCharacterFey::APMPCharacterFey()
 	CurHP = 200;
 }
 
-void APMPCharacterFey::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void APMPCharacterMuriel::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void APMPCharacterFey::BeginPlay()
+void APMPCharacterMuriel::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void APMPCharacterFey::Tick(float DeltaSeconds)
+void APMPCharacterMuriel::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 }

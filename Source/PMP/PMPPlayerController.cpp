@@ -24,6 +24,39 @@ void APMPPlayerController::SetHUDHP(int32 CurHP, int32 MaxHP)
 	}
 }
 
+void APMPPlayerController::SetHUDCooldown1(float CurCooldown, float MaxCooldown)
+{
+	PMPHUD = IsValid(PMPHUD) ? PMPHUD : Cast<APMPHUD>(GetHUD());
+	if (IsValid(PMPHUD) && IsValid(PMPHUD->PlayerOverlay))
+	{
+		const float CoolDownPercent = CurCooldown / MaxCooldown;
+		PMPHUD->PlayerOverlay->AuroraSkill1->SetPercent(CoolDownPercent);
+		PMPHUD->PlayerOverlay->MurielSkill1->SetPercent(CoolDownPercent);
+	}
+}
+
+void APMPPlayerController::SetHUDCooldown2(float CurCooldown, float MaxCooldown)
+{
+	PMPHUD = IsValid(PMPHUD) ? PMPHUD : Cast<APMPHUD>(GetHUD());
+	if (IsValid(PMPHUD) && IsValid(PMPHUD->PlayerOverlay))
+	{
+		const float CoolDownPercent = CurCooldown / MaxCooldown;
+		PMPHUD->PlayerOverlay->AuroraSkill2->SetPercent(CoolDownPercent);
+		PMPHUD->PlayerOverlay->MurielSkill2->SetPercent(CoolDownPercent);
+	}
+}
+
+void APMPPlayerController::SetHUDCooldown3(float CurCooldown, float MaxCooldown)
+{
+	PMPHUD = IsValid(PMPHUD) ? PMPHUD : Cast<APMPHUD>(GetHUD());
+	if (IsValid(PMPHUD) && IsValid(PMPHUD->PlayerOverlay))
+	{
+		const float CoolDownPercent = CurCooldown / MaxCooldown;
+		PMPHUD->PlayerOverlay->AuroraSkill3->SetPercent(CoolDownPercent);
+		PMPHUD->PlayerOverlay->MurielSkill3->SetPercent(CoolDownPercent);
+	}
+}
+
 void APMPPlayerController::BeginPlay()
 {
 	Super::BeginPlay();

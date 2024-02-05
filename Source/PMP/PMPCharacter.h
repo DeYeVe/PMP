@@ -154,7 +154,7 @@ public:
 
 public:
 	void UpdateHUDHP();
-	void UpdateHUDSkill_1();
+	void UpdateHUDSkill();
 
 public:
 	UFUNCTION()

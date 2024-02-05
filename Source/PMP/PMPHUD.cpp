@@ -3,7 +3,10 @@
 
 #include "PMPHUD.h"
 
+#include "PMPCharacterAurora.h"
+#include "PMPCharacterMuriel.h"
 #include "PMPUserWidget.h"
+#include "Components/CanvasPanel.h"
 
 void APMPHUD::DrawHUD()
 {
@@ -17,6 +20,10 @@ void APMPHUD::AddPlayerOveray()
 	{
 		PlayerOverlay = CreateWidget<UPMPUserWidget>(PlayerController, PlayerOverlayClass);
 		PlayerOverlay->AddToViewport();
+		if (!GetOwningPawn()->IsA(APMPCharacterAurora::StaticClass()))
+			PlayerOverlay->AuroraSkill->SetVisibility(ESlateVisibility::Hidden);
+		else if (!GetOwningPawn()->IsA(APMPCharacterMuriel::StaticClass()))
+			PlayerOverlay->MurielSkill->SetVisibility(ESlateVisibility::Hidden);
 	}
 
 }

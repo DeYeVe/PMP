@@ -17,6 +17,13 @@ class PMP_API APMPPlayerController : public APlayerController
 public:
 	UFUNCTION()
 	void SetHUDHP(int32 CurHP, int32 MaxHP);
+	
+	UFUNCTION()
+	void SetHUDCooldown1(float CurCooldown, float MaxCooldown);
+	UFUNCTION()
+	void SetHUDCooldown2(float CurCooldown, float MaxCooldown);
+	UFUNCTION()
+	void SetHUDCooldown3(float CurCooldown, float MaxCooldown);
 
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;

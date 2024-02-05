@@ -81,6 +81,8 @@ void APMPCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	UpdateHUDSkill();
+
 	if (EnumHasAnyFlags(eStatesFlag, EStateFlags::FOCUSING))
 	{
 		float SearchRadius = 1200.f;
@@ -233,8 +235,18 @@ void APMPCharacter::UpdateHUDHP()
 	}
 }
 
-void APMPCharacter::UpdateHUDSkill_1()
+void APMPCharacter::UpdateHUDSkill()
 {
+	PMPPlayerController = IsValid(PMPPlayerController) ? PMPPlayerController : Cast<APMPPlayerController>(Controller);
+	if (PMPPlayerController)
+	{
+		float RemainingTime = GetWorldTimerManager().GetTimerRemaining(SkillCooldownTimerHandles[0]);
+		PMPPlayerController->SetHUDCooldown1(RemainingTime, SkillCooldown[0]);
+		RemainingTime = GetWorldTimerManager().GetTimerRemaining(SkillCooldownTimerHandles[1]);
+		PMPPlayerController->SetHUDCooldown2(RemainingTime, SkillCooldown[1]);
+		RemainingTime = GetWorldTimerManager().GetTimerRemaining(SkillCooldownTimerHandles[2]);
+		PMPPlayerController->SetHUDCooldown3(RemainingTime, SkillCooldown[2]);
+	}
 }
 
 void APMPCharacter::Attack()

@@ -30,6 +30,11 @@ public:
 	void PlayAuroraSkill_2Montage();
 	void PlayAuroraSkill_3Montage();
 	
+	void PlayMurielAttackMontage();
+	void PlayMurielSkill_1Montage();
+	void PlayMurielSkill_2Montage();
+	void PlayMurielSkill_3Montage();
+	
 	void PlayBearAttackMontage();
 	void PlayBearHitMontage();
 	void PlayBearDieMontage();
@@ -45,6 +50,15 @@ private:
 	void AnimNotify_AuroraSkill_3() const;
 	
 	UFUNCTION()
+	void AnimNotify_MurielAttack() const;
+	UFUNCTION()
+	void AnimNotify_MurielSkill_1() const;
+	UFUNCTION()
+	void AnimNotify_MurielSkill_2() const;
+	UFUNCTION()
+	void AnimNotify_MurielSkill_3() const;
+	
+	UFUNCTION()
 	void AnimNotify_BearAttack() const;
 	
 public:
@@ -56,6 +70,15 @@ public:
 	UAnimMontage* AuroraSkill_2Montage;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Aurora, Meta=(AllowPrivateAccess=true)) \
 	UAnimMontage* AuroraSkill_3Montage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Muriel, Meta=(AllowPrivateAccess=true)) \
+	UAnimMontage* MurielAttackMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Muriel, Meta=(AllowPrivateAccess=true)) \
+	UAnimMontage* MurielSkill_1Montage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Muriel, Meta=(AllowPrivateAccess=true)) \
+	UAnimMontage* MurielSkill_2Montage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Muriel, Meta=(AllowPrivateAccess=true)) \
+	UAnimMontage* MurielSkill_3Montage;
 
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=EnemyBear, Meta=(AllowPrivateAccess=true)) \
@@ -86,5 +109,11 @@ public:
 	FOnAttack OnAuroraSkill_1;
 	FOnAttack OnAuroraSkill_2;
 	FOnAttack OnAuroraSkill_3;
+	
+	FOnAttack OnMurielAttack;
+	FOnAttack OnMurielSkill_1;
+	FOnAttack OnMurielSkill_2;
+	FOnAttack OnMurielSkill_3;
+	
 	FOnAttack OnBearAttack;
 };

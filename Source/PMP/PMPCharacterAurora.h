@@ -87,6 +87,5 @@ private:
 	UPROPERTY()
 	UParticleSystem* SKill_3FX_2;
 	UPROPERTY()
-	UParticleSystem* SKill_3FX_3;
-	
+	UParticleSystem* SKill_3FX_3;	
 };

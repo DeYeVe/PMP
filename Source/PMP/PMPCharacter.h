@@ -137,20 +137,24 @@ protected:
 	int32 MaxHP;
 	UPROPERTY(EditAnywhere, Category = "Player Stats")
 	int32 Damage;
-	
 	UFUNCTION(BlueprintCallable)
 	void OnRep_HP(int32 LastHP);
+	UPROPERTY(Replicated)
+	int32 TakenDamage;
 
 	
 public:
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	int32 GetCurHP() const { return CurHP; };	
 	UFUNCTION()
 	void SetCurHP(int32 HP) { CurHP = HP; };
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	int32 GetMaxHP() const { return MaxHP; };
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	int32 GetDamage() const { return Damage; };
+	
+	UFUNCTION(BlueprintCallable)
+	int32 GetTakenDamage() const { return TakenDamage; };
 
 public:
 	void UpdateHUDHP();
@@ -181,5 +185,12 @@ public:
 
 	UFUNCTION()
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "TakeDamage")
+	void OnTakeDamageExecuted();
+	
+	UFUNCTION(BlueprintImplementableEvent, Category = "TakeHeal")
+	void OnTakeHealExecuted();
+
 };
 

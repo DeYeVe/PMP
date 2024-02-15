@@ -22,6 +22,11 @@ UPMPAnimInstance::UPMPAnimInstance()
 	InitMontage(TEXT("AnimMontage'/Game/Player/Aurora/Animation/AM_Skill2.AM_Skill2'"), AuroraSkill_2Montage);
 	InitMontage(TEXT("AnimMontage'/Game/Player/Aurora/Animation/AM_Skill3.AM_Skill3'"), AuroraSkill_3Montage);
 	
+	InitMontage(TEXT("AnimMontage'/Game/Player/Muriel/Animation/AM_Attack.AM_Attack'"), MurielAttackMontage);
+	InitMontage(TEXT("AnimMontage'/Game/Player/Muriel/Animation/AM_Skill1.AM_Skill1'"), MurielSkill_1Montage);
+	InitMontage(TEXT("AnimMontage'/Game/Player/Muriel/Animation/AM_Skill2.AM_Skill2'"), MurielSkill_2Montage);
+	InitMontage(TEXT("AnimMontage'/Game/Player/Muriel/Animation/AM_Skill3.AM_Skill3'"), MurielSkill_3Montage);
+	
 	InitMontage(TEXT("AnimMontage'/Game/Enemies/Bear/AM_Attack.AM_Attack'"), BearAttackMontage);
 	InitMontage(TEXT("AnimMontage'/Game/Enemies/Bear/AM_Hit.AM_Hit'"), BearHitMontage);
 	InitMontage(TEXT("AnimMontage'/Game/Enemies/Bear/AM_Die.AM_Die'"), BearDieMontage);
@@ -49,7 +54,7 @@ void UPMPAnimInstance::PlayAuroraAttackMontage(int32 Index)
 	if (!IsValid(AuroraAttackMontage))
 		return;
 	
-	Montage_Play(AuroraAttackMontage, 1.f);
+	Montage_Play(AuroraAttackMontage, PlayRate);
 	Montage_JumpToSection(FName(*FString::FromInt(Index)));
 }
 
@@ -58,7 +63,7 @@ void UPMPAnimInstance::PlayAuroraSkill_1Montage()
 	if (!IsValid(AuroraSkill_1Montage))
 		return;
 	
-	Montage_Play(AuroraSkill_1Montage, 1.f);
+	Montage_Play(AuroraSkill_1Montage, PlayRate);
 }
 
 void UPMPAnimInstance::PlayAuroraSkill_2Montage()
@@ -66,7 +71,7 @@ void UPMPAnimInstance::PlayAuroraSkill_2Montage()
 	if (!IsValid(AuroraSkill_2Montage))
 		return;
 	
-	Montage_Play(AuroraSkill_2Montage, 1.f);
+	Montage_Play(AuroraSkill_2Montage, PlayRate);
 }
 
 void UPMPAnimInstance::PlayAuroraSkill_3Montage()
@@ -74,7 +79,39 @@ void UPMPAnimInstance::PlayAuroraSkill_3Montage()
 	if (!IsValid(AuroraSkill_3Montage))
 		return;
 	
-	Montage_Play(AuroraSkill_3Montage, 1.f);
+	Montage_Play(AuroraSkill_3Montage, PlayRate);
+}
+
+void UPMPAnimInstance::PlayMurielAttackMontage()
+{
+	if (!IsValid(MurielAttackMontage))
+		return;
+	
+	Montage_Play(MurielAttackMontage, PlayRate);
+}
+
+void UPMPAnimInstance::PlayMurielSkill_1Montage()
+{
+	if (!IsValid(MurielSkill_1Montage))
+		return;
+	
+	Montage_Play(MurielSkill_1Montage, PlayRate);
+}
+
+void UPMPAnimInstance::PlayMurielSkill_2Montage()
+{
+	if (!IsValid(MurielSkill_2Montage))
+		return;
+	
+	Montage_Play(MurielSkill_2Montage, PlayRate);
+}
+
+void UPMPAnimInstance::PlayMurielSkill_3Montage()
+{
+	if (!IsValid(MurielSkill_3Montage))
+		return;
+	
+	Montage_Play(MurielSkill_3Montage, PlayRate);
 }
 
 void UPMPAnimInstance::PlayBearAttackMontage()
@@ -82,7 +119,7 @@ void UPMPAnimInstance::PlayBearAttackMontage()
 	if (!IsValid(BearAttackMontage))
 		return;
 	
-	Montage_Play(BearAttackMontage, 1.f);
+	Montage_Play(BearAttackMontage, PlayRate);
 }
 
 void UPMPAnimInstance::PlayBearHitMontage()
@@ -90,7 +127,9 @@ void UPMPAnimInstance::PlayBearHitMontage()
 	if (!IsValid(BearHitMontage))
 		return;
 	
-	Montage_Play(BearHitMontage, 1.f);
+	Montage_Play(BearHitMontage, PlayRate);
+	
+	UE_LOG(LogTemp, Warning, TEXT("hit bear montage playRate %f"), PlayRate);
 }
 
 void UPMPAnimInstance::PlayBearDieMontage()
@@ -98,7 +137,7 @@ void UPMPAnimInstance::PlayBearDieMontage()
 	if (!IsValid(BearDieMontage))
 		return;
 	
-	Montage_Play(BearDieMontage, 1.f);
+	Montage_Play(BearDieMontage, PlayRate);
 }
 
 void UPMPAnimInstance::AnimNotify_AuroraAttack() const
@@ -120,6 +159,26 @@ void UPMPAnimInstance::AnimNotify_AuroraSkill_2() const
 void UPMPAnimInstance::AnimNotify_AuroraSkill_3() const
 {
 	OnAuroraSkill_3.Broadcast();
+}
+
+void UPMPAnimInstance::AnimNotify_MurielAttack() const
+{
+	OnMurielAttack.Broadcast();
+}
+
+void UPMPAnimInstance::AnimNotify_MurielSkill_1() const
+{
+	OnMurielSkill_1.Broadcast();
+}
+
+void UPMPAnimInstance::AnimNotify_MurielSkill_2() const
+{
+	OnMurielSkill_2.Broadcast();
+}
+
+void UPMPAnimInstance::AnimNotify_MurielSkill_3() const
+{
+	OnMurielSkill_3.Broadcast();
 }
 
 void UPMPAnimInstance::AnimNotify_BearAttack() const

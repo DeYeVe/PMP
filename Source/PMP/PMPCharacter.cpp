@@ -122,10 +122,11 @@ void APMPCharacter::Tick(float DeltaSeconds)
 			
 				// Focusing
 
+				
 				FVector Target = PMPMonster->GetActorLocation();
-				float Dist = GetDistanceTo(PMPMonster);
-				Target.Z -= Dist / FMath::Sqrt(3.f);
-				FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Target);
+				//float Dist = GetDistanceTo(PMPMonster);
+				//Target.Z -= Dist / FMath::Sqrt(3.f);
+				FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetCameraBoom()->GetComponentLocation(), Target);
 				FRotator NewRotation = FMath::RInterpTo(GetControlRotation(), LookAtRotation, DeltaSeconds, 10.0f);
 				GetController()->SetControlRotation(NewRotation);
 				return;
@@ -284,10 +285,17 @@ void APMPCharacter::ToggleFocusing()
 
 float APMPCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
                                 AActor* DamageCauser)
-{	
+{
+	TakenDamage = DamageAmount;
 	CurHP -= DamageAmount;
+	CurHP = CurHP > MaxHP ? MaxHP : CurHP;
+	
+	if (DamageAmount > 0.f)
+		OnTakeDamageExecuted();
+	else if (DamageAmount < 0.f)
+		OnTakeHealExecuted();
+	
 	UpdateHUDHP();
-	UE_LOG(LogTemp, Warning, TEXT("take damage %d"), CurHP);
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }

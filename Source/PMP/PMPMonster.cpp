@@ -35,8 +35,9 @@ void APMPMonster::BeginPlay()
 
 // Called every frame
 void APMPMonster::Tick(float DeltaTime)
-{
+{	
 	Super::Tick(DeltaTime);
+	UE_LOG(LogTemp, Warning, TEXT("%f"), GetCharacterMovement()->GetMaxSpeed());
 
 }
 
@@ -76,47 +77,103 @@ void APMPMonster::Die()
 float APMPMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
                               AActor* DamageCauser)
 {
-	if (!HasAuthority())
-		return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);;
-	
 	TakenDamage = DamageAmount;
 	CurHP -= DamageAmount;
 	if (CurHP <= 0)
 	{
+		OnFrozenReleased();
 		Die();
 	}
 	else
 	{
 		Hit();
-	}	
+	}
 	OnTakeDamageExecuted();
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
-void APMPMonster::SetFrozen()
+void APMPMonster::SetFrozen(float DamageAmount)
 {
+	CanAct = false;
+	TakenDamage = DamageAmount;
+	CurHP -= DamageAmount;
+	
+	OnTakeDamageExecuted();
+	
+	if (CurHP <= 0)
+	{
+		OnFrozenReleased();
+		Die();
+		
+		return;
+	}
+	
 	UE_LOG(LogTemp, Warning, TEXT("Frozen"));
 	EnumAddFlags(eStatesFlag, EEnemyStateFlags::FROZEN);
 	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(OriginalMaterial, this);
 	DynamicMaterial->SetVectorParameterValue("EmissiveColor", FLinearColor(0.0f, 0.0f, 1.0f));
 	DynamicMaterial->SetScalarParameterValue("EmissiveIntensity", 10.0f);
-
 	GetMesh()->SetMaterial(0, DynamicMaterial);
     DynamicMaterial->PostEditChange();
+	
 	AnimInstance->SetPlayRate(0.f);
 	AnimInstance->Montage_SetPlayRate(AnimInstance->GetCurrentActiveMontage(), AnimInstance->GetPlayRate());
 	
 	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, [this]()
-	{
-		GetMesh()->SetMaterial(0, OriginalMaterial);
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &APMPMonster::OnFrozenReleased, 3.0f, false);
+}
+
+void APMPMonster::OnFrozenReleased()
+{
+	CanAct = true;
+	GetMesh()->SetMaterial(0, OriginalMaterial);
     
-		EnumRemoveFlags(eStatesFlag, EEnemyStateFlags::FROZEN);;
-		AnimInstance->SetPlayRate(1.f);
-		AnimInstance->Montage_SetPlayRate(AnimInstance->GetCurrentActiveMontage(), AnimInstance->GetPlayRate());
-		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-	}, 3.0f, false);
+	EnumRemoveFlags(eStatesFlag, EEnemyStateFlags::FROZEN);;
+	AnimInstance->SetPlayRate(1.f);
+	AnimInstance->Montage_SetPlayRate(AnimInstance->GetCurrentActiveMontage(), AnimInstance->GetPlayRate());
+}
+
+void APMPMonster::SetSlow(float DamageAmount)
+{
+	TakenDamage = DamageAmount;
+	CurHP -= DamageAmount;
+	
+	OnTakeDamageExecuted();
+	
+	if (CurHP <= 0)
+	{
+		OnSlowReleased();
+		Die();
+		
+		return;
+	}
+	
+	EnumAddFlags(eStatesFlag, EEnemyStateFlags::SLOW);
+	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(OriginalMaterial, this);
+	DynamicMaterial->SetVectorParameterValue("EmissiveColor", FLinearColor(0.0f, 0.6f, 0.0f));
+	DynamicMaterial->SetScalarParameterValue("EmissiveIntensity", 1.0f);
+	GetMesh()->SetMaterial(0, DynamicMaterial);
+	DynamicMaterial->PostEditChange();
+	
+	AnimInstance->SetPlayRate(1.f / 3.f);
+	AnimInstance->Montage_SetPlayRate(AnimInstance->GetCurrentActiveMontage(), AnimInstance->GetPlayRate());
+	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed / 3.f;
+	
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &APMPMonster::OnSlowReleased, 5.0f, false);
+
+}
+
+void APMPMonster::OnSlowReleased()
+{
+	GetMesh()->SetMaterial(0, OriginalMaterial);
+    
+	EnumRemoveFlags(eStatesFlag, EEnemyStateFlags::SLOW);;
+	AnimInstance->SetPlayRate(1.f);
+	AnimInstance->Montage_SetPlayRate(AnimInstance->GetCurrentActiveMontage(), AnimInstance->GetPlayRate());
+
+	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
 }
 
 void APMPMonster::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)

@@ -64,7 +64,6 @@ void APMPCharacterAurora::BeginPlay()
 	AnimInstance->OnAuroraSkill_1.AddUObject(this, &APMPCharacterAurora::CheckSkill_1);
 	AnimInstance->OnAuroraSkill_2.AddUObject(this, &APMPCharacterAurora::CheckSkill_2);
 	AnimInstance->OnAuroraSkill_3.AddUObject(this, &APMPCharacterAurora::CheckSkill_3);
-
 }
 
 void APMPCharacterAurora::Tick(float DeltaSeconds)
@@ -425,11 +424,8 @@ void APMPCharacterAurora::CheckSkill_3()
 		{
 			if (HitResult.GetActor()->IsA(APMPMonster::StaticClass()))
 			{
-				Cast<APMPMonster>(HitResult.GetActor())->SetFrozen();
+				Cast<APMPMonster>(HitResult.GetActor())->SetFrozen(float(GetDamage()) * 1.4);
 			}
-			FDamageEvent DamageEvent;
-			HitResult.GetActor()->TakeDamage(float(GetDamage()) * 1.4, DamageEvent, GetController(), this);
-			
 		}
 	}
 	

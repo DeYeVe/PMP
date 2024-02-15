@@ -69,6 +69,8 @@ protected:
 	virtual void OnRep_HP(int32 LastHP);
 	UPROPERTY(Replicated)
 	int32 TakenDamage;
+	UPROPERTY()
+	float MoveSpeed = 600.f;
 
 public:
 	UFUNCTION()
@@ -95,16 +97,29 @@ public:
 	
 	UFUNCTION()	
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 	UFUNCTION()
-	virtual void SetFrozen();
+	virtual void SetFrozen(float DamageAmount);
 	UFUNCTION()
 	bool GetFrozen() const { return EnumHasAnyFlags(eStatesFlag, EEnemyStateFlags::FROZEN); };
+	UFUNCTION()
+	virtual void OnFrozenReleased();
+
+	UFUNCTION()
+	virtual void SetSlow(float DamageAmount);
+	UFUNCTION()
+	virtual void OnSlowReleased();
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "TakeDamage")
 	void OnTakeDamageExecuted();
 
 	UPROPERTY(Replicated)
 	bool IsActing;
+	
+	UPROPERTY()
+	bool CanAct = true;
+	UFUNCTION()
+	bool GetCanAct() const { return CanAct; };
 	
 	FOnAttackEnd OnAttackEnd;
 	FOnHitEnd OnHitEnd;

@@ -36,8 +36,8 @@ APMPMonsterBear::APMPMonsterBear()
 
 	
 	Damage = 12;
-	MaxHP = 120;
-	CurHP = 120;
+	MaxHP = 240;
+	CurHP = MaxHP;
 }
 
 void APMPMonsterBear::BeginPlay()
@@ -70,6 +70,8 @@ void APMPMonsterBear::Hit()
 {
 	Super::Hit();
 
+	CanAct = false;
+
 	if(IsActing)
 		return;
 	
@@ -95,6 +97,8 @@ void APMPMonsterBear::Attack()
 void APMPMonsterBear::Die()
 {
 	Super::Die();
+
+	CanAct = false;
 
 	if(IsActing)
 		return;
@@ -215,6 +219,7 @@ void APMPMonsterBear::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	else if (Montage == AnimInstance->BearHitMontage)
 	{
 		OnHitEnd.Broadcast();
+		CanAct = true;
 		return;		
 	}
 	else if (Montage == AnimInstance->BearDieMontage)

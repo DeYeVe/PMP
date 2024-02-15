@@ -26,10 +26,6 @@ bool UBTDecorator_CanAttack::CalculateRawConditionValue(UBehaviorTreeComponent& 
 	auto Target = Cast<APMPCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(FName(TEXT("Target"))));
 	if (Target == nullptr)
 		return false;
-
-	if (CurrentPawn->IsA(APMPMonster::StaticClass()))
-		if (Cast<APMPMonster>(CurrentPawn)->GetFrozen())
-			return false;
 	
 	return bResult && Target->GetDistanceTo(CurrentPawn) <= 300.f;
 }

@@ -9,6 +9,15 @@
 /**
  * 
  */
+
+UENUM(BlueprintType)
+enum class EBuff : uint8
+{
+	Boost,
+	Strengthen,
+	Invincible
+};
+
 UCLASS()
 class PMP_API APMPPlayerController : public APlayerController
 {
@@ -24,7 +33,22 @@ public:
 	void SetHUDCooldown2(float CurCooldown, float MaxCooldown);
 	UFUNCTION()
 	void SetHUDCooldown3(float CurCooldown, float MaxCooldown);
+	
+	UFUNCTION()
+	void SetHUDBuffBoost(float RemainingTime, float Duration);
+	UFUNCTION()
+	void SetHUDBufStrengthen(float RemainingTime, float Duration);
+	UFUNCTION()
+	void SetHUDBuffInvincible(float RemainingTime, float Duration);
 
+	UPROPERTY()
+	bool IsBoost;
+	UPROPERTY()
+	bool IsStrengthened;
+	UPROPERTY()
+	bool IsInvincivle;
+
+	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 

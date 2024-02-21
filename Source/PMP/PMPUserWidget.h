@@ -47,4 +47,31 @@ public:
 	
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* MurielSkill3;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UCanvasPanel* BoostPanel;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* Boost;
+
+	UPROPERTY(meta = (BindWidget))
+	class UImage* BoostBG;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UCanvasPanel* StrengthenPanel;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* Strengthen;
+
+	UPROPERTY(meta = (BindWidget))
+	class UImage* StrengthenBG;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UCanvasPanel* InvinciblePanel;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* Invincible;
+
+	UPROPERTY(meta = (BindWidget))
+	class UImage* InvincibleBG;
 };

@@ -6,6 +6,8 @@
 #include "PMPCharacter.h"
 #include "PMPHUD.h"
 #include "PMPUserWidget.h"
+#include "Components/CanvasPanel.h"
+#include "Components/CanvasPanelSlot.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 
@@ -55,6 +57,101 @@ void APMPPlayerController::SetHUDCooldown3(float CurCooldown, float MaxCooldown)
 		PMPHUD->PlayerOverlay->AuroraSkill3->SetPercent(CoolDownPercent);
 		PMPHUD->PlayerOverlay->MurielSkill3->SetPercent(CoolDownPercent);
 	}
+}
+
+void APMPPlayerController::SetHUDBuffBoost(float RemainingTime, float Duration)
+{
+	PMPHUD = IsValid(PMPHUD) ? PMPHUD : Cast<APMPHUD>(GetHUD());
+	if (IsValid(PMPHUD) && IsValid(PMPHUD->PlayerOverlay))
+	{
+		if (RemainingTime <= 0.f)
+		{
+			PMPHUD->PlayerOverlay->BoostPanel->SetVisibility(ESlateVisibility::Hidden);
+			IsBoost = false;
+			return;
+		}
+		
+		PMPHUD->PlayerOverlay->BoostPanel->SetVisibility(ESlateVisibility::Visible);
+		float ElapsedTime = Duration - RemainingTime;
+		const float DurationPercent = ElapsedTime / Duration;
+		PMPHUD->PlayerOverlay->Boost->SetPercent(DurationPercent);
+		IsBoost = true;
+	}
+}
+
+void APMPPlayerController::SetHUDBufStrengthen(float RemainingTime, float Duration)
+{
+	PMPHUD = IsValid(PMPHUD) ? PMPHUD : Cast<APMPHUD>(GetHUD());
+	if (IsValid(PMPHUD) && IsValid(PMPHUD->PlayerOverlay))
+	{
+		if (RemainingTime <= 0.f)
+		{
+			PMPHUD->PlayerOverlay->StrengthenPanel->SetVisibility(ESlateVisibility::Hidden);
+			IsStrengthened = false;
+			return;
+		}
+		
+		PMPHUD->PlayerOverlay->StrengthenPanel->SetVisibility(ESlateVisibility::Visible);
+		float ElapsedTime = Duration - RemainingTime;
+		const float DurationPercent = ElapsedTime / Duration;
+		PMPHUD->PlayerOverlay->Strengthen->SetPercent(DurationPercent);
+		IsStrengthened = true;
+		
+		UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(PMPHUD->PlayerOverlay->StrengthenPanel->Slot);
+		if (CanvasSlot)
+		{
+			if (IsBoost)
+			{
+				CanvasSlot->SetPosition(FVector2D(70.f, 0.f));
+			}
+			else
+			{
+				CanvasSlot->SetPosition(FVector2D(0.f, 0.f));
+			}
+		}
+	}
+}
+
+void APMPPlayerController::SetHUDBuffInvincible(float RemainingTime, float Duration)
+{
+	PMPHUD = IsValid(PMPHUD) ? PMPHUD : Cast<APMPHUD>(GetHUD());
+	if (IsValid(PMPHUD) && IsValid(PMPHUD->PlayerOverlay))
+	{		
+		if (RemainingTime <= 0.f)
+		{
+			PMPHUD->PlayerOverlay->InvinciblePanel->SetVisibility(ESlateVisibility::Hidden);
+			IsInvincivle = false;
+			return;
+		}
+		
+		PMPHUD->PlayerOverlay->InvinciblePanel->SetVisibility(ESlateVisibility::Visible);
+		float ElapsedTime = Duration - RemainingTime;
+		const float DurationPercent = ElapsedTime / Duration;
+		PMPHUD->PlayerOverlay->Invincible->SetPercent(DurationPercent);
+		IsInvincivle = true;
+		
+		UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(PMPHUD->PlayerOverlay->InvinciblePanel->Slot);
+		if (CanvasSlot)
+		{
+			if (IsBoost && IsStrengthened)
+			{
+				CanvasSlot->SetPosition(FVector2D(140.f, 0.f));
+			}
+			else if (!IsBoost && !IsStrengthened)
+			{
+				CanvasSlot->SetPosition(FVector2D(0.f, 0.f));
+			}
+			else
+			{
+				CanvasSlot->SetPosition(FVector2D(70.f, 0.f));
+			}
+		}
+	}
+}
+
+void APMPPlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
 }
 
 void APMPPlayerController::BeginPlay()

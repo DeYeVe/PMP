@@ -166,6 +166,7 @@ public:
 public:
 	void UpdateHUDHP();
 	void UpdateHUDSkill();
+	void UpdateHUDBuff();
 
 public:
 	UFUNCTION()
@@ -182,7 +183,9 @@ public:
 	
 	FTimerHandle SkillCooldownTimerHandles[3];
 	bool IsSkillOnCooldown[3];
-	float SkillCooldown[3]; 
+	float SkillCooldown[3];
+	
+	FTimerHandle BuffTimerHandles[3];
 
 	UFUNCTION()
 	virtual void StartSkillCooldown(int32 SkillIndex);

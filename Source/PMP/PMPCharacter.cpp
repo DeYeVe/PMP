@@ -83,6 +83,7 @@ void APMPCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	UpdateHUDSkill();
+	UpdateHUDBuff();
 
 	if (EnumHasAnyFlags(eStatesFlag, EStateFlags::FOCUSING))
 	{
@@ -253,6 +254,20 @@ void APMPCharacter::UpdateHUDSkill()
 	}
 }
 
+void APMPCharacter::UpdateHUDBuff()
+{
+	PMPPlayerController = IsValid(PMPPlayerController) ? PMPPlayerController : Cast<APMPPlayerController>(Controller);
+	if (PMPPlayerController)
+	{
+		float RemainingTime = GetWorldTimerManager().GetTimerRemaining(BuffTimerHandles[0]);
+		PMPPlayerController->SetHUDBuffBoost(RemainingTime, 8.f);
+		RemainingTime = GetWorldTimerManager().GetTimerRemaining(BuffTimerHandles[1]);
+		PMPPlayerController->SetHUDBufStrengthen(RemainingTime, 8.f);
+		RemainingTime = GetWorldTimerManager().GetTimerRemaining(BuffTimerHandles[2]);
+		PMPPlayerController->SetHUDBuffInvincible(RemainingTime, 8.f);
+	}
+}
+
 void APMPCharacter::Attack()
 {
 }
@@ -317,8 +332,7 @@ void APMPCharacter::SetBoost()
 
 	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed * 1.5;
 	
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &APMPCharacter::OnBoostReleased, 8.0f, false);
+	GetWorldTimerManager().SetTimer(BuffTimerHandles[0], this, &APMPCharacter::OnBoostReleased, 8.0f, false);
 }
 
 void APMPCharacter::OnBoostReleased()
@@ -341,8 +355,7 @@ void APMPCharacter::SetStrengthen()
 
 	Damage = int32(float(DefaultDamage) * 1.5f);
 	
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &APMPCharacter::OnStrengthenReleased, 8.0f, false);
+	GetWorldTimerManager().SetTimer(BuffTimerHandles[1], this, &APMPCharacter::OnStrengthenReleased, 8.0f, false);
 }
 
 void APMPCharacter::OnStrengthenReleased()
@@ -363,8 +376,7 @@ void APMPCharacter::SetInvincible()
 	GetMesh()->SetMaterial(0, DynamicMaterial);
 	DynamicMaterial->PostEditChange();
 	
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &APMPCharacter::OnInvincibleReleased, 8.0f, false);
+	GetWorldTimerManager().SetTimer(BuffTimerHandles[2], this, &APMPCharacter::OnInvincibleReleased, 8.0f, false);
 
 }
 

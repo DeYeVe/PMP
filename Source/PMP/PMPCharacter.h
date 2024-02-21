@@ -20,7 +20,7 @@ enum class EStateFlags : uint8
 {
 	ACTING = 1 << 1,
 	STRENGTHENED = 1 << 2,
-	SPEEDUP = 1 << 3,
+	BOOST = 1 << 3,
 	SILENCED = 1 << 4,
 	SLOW = 1 << 5,
 	INVINCIBLE = 1 << 6,
@@ -82,6 +82,9 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, Category=Mesh)
 	USkeletalMeshComponent* MeshCharacter;
+	
+	UPROPERTY()
+	UMaterialInterface* OriginalMaterial;
 
 public:
 	APMPCharacter();
@@ -137,10 +140,14 @@ protected:
 	int32 MaxHP;
 	UPROPERTY(EditAnywhere, Category = "Player Stats")
 	int32 Damage;
+	UPROPERTY(EditAnywhere, Category = "Player Stats")
+	int32 DefaultDamage;
 	UFUNCTION(BlueprintCallable)
 	void OnRep_HP(int32 LastHP);
 	UPROPERTY(Replicated)
 	int32 TakenDamage;
+	UPROPERTY()
+	float MoveSpeed = 600.f;
 
 	
 public:
@@ -186,11 +193,25 @@ public:
 	UFUNCTION()
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	UFUNCTION()
+	void SetBoost();
+	UFUNCTION()
+	virtual void OnBoostReleased();
+	
+	UFUNCTION()
+	void SetStrengthen();
+	UFUNCTION()
+	virtual void OnStrengthenReleased();
+	
+	UFUNCTION()
+	void SetInvincible();
+	UFUNCTION()
+	virtual void OnInvincibleReleased();
+	
 	UFUNCTION(BlueprintImplementableEvent, Category = "TakeDamage")
 	void OnTakeDamageExecuted();
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "TakeHeal")
 	void OnTakeHealExecuted();
-
 };
 

@@ -42,7 +42,8 @@ APMPCharacterAurora::APMPCharacterAurora()
 	InitFX(TEXT("ParticleSystem'/Game/ParagonAurora/FX/Particles/Abilities/Ultimate/FX/P_Aurora_Frozen_Ground_Water_Ultimate.P_Aurora_Frozen_Ground_Water_Ultimate'"), SKill_3FX_3);
 
 	
-	Damage = 35;
+	DefaultDamage = 35;
+	Damage = DefaultDamage;
 	MaxHP = 200;
 	CurHP = 200;
 	SkillCooldown[0] = 3.0f;
@@ -211,7 +212,7 @@ void APMPCharacterAurora::CheckSkill_1()
 	TArray<FHitResult> HitResults;
 	FCollisionQueryParams Params(NAME_None, false, this);
 
-	float AttackRange = 180.f;
+	float AttackRange = 220.f;
 	float AttackWidth = 360.f;
 	float AttackHeight = 100.f;
 	float HalfExtent = AttackRange / 2.0f;

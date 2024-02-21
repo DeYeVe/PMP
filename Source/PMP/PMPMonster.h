@@ -31,6 +31,8 @@ public:
 protected:	
 	UPROPERTY(VisibleAnywhere, Category=Mesh)
 	USkeletalMeshComponent* MeshMonster;
+	
+	UPROPERTY()
 	UMaterialInterface* OriginalMaterial;
 	
 public:	
@@ -70,7 +72,7 @@ protected:
 	UPROPERTY(Replicated)
 	int32 TakenDamage;
 	UPROPERTY()
-	float MoveSpeed = 600.f;
+	float MoveSpeed = 400.f;
 
 public:
 	UFUNCTION()
@@ -126,5 +128,4 @@ public:
 	
 	UFUNCTION()
 	virtual void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
-
 };

@@ -77,7 +77,7 @@ public:
 	TSubclassOf<class APMPProjectile> Skill1ProjectileClass;
 	UPROPERTY(EditDefaultsOnly, Category=Projectile)
 	TSubclassOf<class APMPProjectile> Skill2ProjectileClass;
-	UPROPERTY(EditDefaultsOnly, Category=Projectile)
-	TSubclassOf<class APMPProjectile> Skill3ProjectileClass;
-
+	
+	UPROPERTY()
+	UParticleSystem* SKill_3FX;	
 };

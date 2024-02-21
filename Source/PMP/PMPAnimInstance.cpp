@@ -8,7 +8,7 @@
 
 UPMPAnimInstance::UPMPAnimInstance()
 {
-	auto InitMontage = [this](const FString& MontagePath, UAnimMontage*& Montage)
+	auto InitMontage = [this](UAnimMontage*& Montage, const FString& MontagePath)
 	{
 		const ConstructorHelpers::FObjectFinder<UAnimMontage> MontageFinder(*MontagePath);
 		if (MontageFinder.Succeeded())
@@ -17,19 +17,19 @@ UPMPAnimInstance::UPMPAnimInstance()
 		}
 	};
 	
-	InitMontage(TEXT("AnimMontage'/Game/Player/Aurora/Animation/AM_Attack.AM_Attack'"), AuroraAttackMontage);
-	InitMontage(TEXT("AnimMontage'/Game/Player/Aurora/Animation/AM_Skill1.AM_Skill1'"), AuroraSkill_1Montage);
-	InitMontage(TEXT("AnimMontage'/Game/Player/Aurora/Animation/AM_Skill2.AM_Skill2'"), AuroraSkill_2Montage);
-	InitMontage(TEXT("AnimMontage'/Game/Player/Aurora/Animation/AM_Skill3.AM_Skill3'"), AuroraSkill_3Montage);
+	InitMontage(AuroraAttackMontage, TEXT("AnimMontage'/Game/Player/Aurora/Animation/AM_Attack.AM_Attack'"));
+	InitMontage(AuroraSkill_1Montage, TEXT("AnimMontage'/Game/Player/Aurora/Animation/AM_Skill1.AM_Skill1'"));
+	InitMontage(AuroraSkill_2Montage, TEXT("AnimMontage'/Game/Player/Aurora/Animation/AM_Skill2.AM_Skill2'"));
+	InitMontage(AuroraSkill_3Montage, TEXT("AnimMontage'/Game/Player/Aurora/Animation/AM_Skill3.AM_Skill3'"));
 	
-	InitMontage(TEXT("AnimMontage'/Game/Player/Muriel/Animation/AM_Attack.AM_Attack'"), MurielAttackMontage);
-	InitMontage(TEXT("AnimMontage'/Game/Player/Muriel/Animation/AM_Skill1.AM_Skill1'"), MurielSkill_1Montage);
-	InitMontage(TEXT("AnimMontage'/Game/Player/Muriel/Animation/AM_Skill2.AM_Skill2'"), MurielSkill_2Montage);
-	InitMontage(TEXT("AnimMontage'/Game/Player/Muriel/Animation/AM_Skill3.AM_Skill3'"), MurielSkill_3Montage);
+	InitMontage(MurielAttackMontage, TEXT("AnimMontage'/Game/Player/Muriel/Animation/AM_Attack.AM_Attack'"));
+	InitMontage(MurielSkill_1Montage, TEXT("AnimMontage'/Game/Player/Muriel/Animation/AM_Skill1.AM_Skill1'"));
+	InitMontage(MurielSkill_2Montage, TEXT("AnimMontage'/Game/Player/Muriel/Animation/AM_Skill2.AM_Skill2'"));
+	InitMontage(MurielSkill_3Montage, TEXT("AnimMontage'/Game/Player/Muriel/Animation/AM_Skill3.AM_Skill3'"));
 	
-	InitMontage(TEXT("AnimMontage'/Game/Enemies/Bear/AM_Attack.AM_Attack'"), BearAttackMontage);
-	InitMontage(TEXT("AnimMontage'/Game/Enemies/Bear/AM_Hit.AM_Hit'"), BearHitMontage);
-	InitMontage(TEXT("AnimMontage'/Game/Enemies/Bear/AM_Die.AM_Die'"), BearDieMontage);
+	InitMontage(BearAttackMontage, TEXT("AnimMontage'/Game/Enemies/Bear/AM_Attack.AM_Attack'"));
+	InitMontage(BearHitMontage, TEXT("AnimMontage'/Game/Enemies/Bear/AM_Hit.AM_Hit'"));
+	InitMontage(BearDieMontage, TEXT("AnimMontage'/Game/Enemies/Bear/AM_Die.AM_Die'"));
 }
 
 void UPMPAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -142,7 +142,6 @@ void UPMPAnimInstance::PlayBearDieMontage()
 
 void UPMPAnimInstance::AnimNotify_AuroraAttack() const
 {
-	UE_LOG(LogTemp, Warning, TEXT("delegate anim notify attack"));
 	OnAuroraAttack.Broadcast();
 }
 

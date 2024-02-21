@@ -37,7 +37,6 @@ void APMPMonster::BeginPlay()
 void APMPMonster::Tick(float DeltaTime)
 {	
 	Super::Tick(DeltaTime);
-	UE_LOG(LogTemp, Warning, TEXT("%f"), GetCharacterMovement()->GetMaxSpeed());
 
 }
 
@@ -78,9 +77,15 @@ float APMPMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
                               AActor* DamageCauser)
 {
 	TakenDamage = DamageAmount;
+	
+	if (!HasAuthority())
+		return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	
 	CurHP -= DamageAmount;
+	
 	if (CurHP <= 0)
 	{
+		OnSlowReleased();
 		OnFrozenReleased();
 		Die();
 	}
@@ -95,21 +100,24 @@ float APMPMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
 
 void APMPMonster::SetFrozen(float DamageAmount)
 {
-	CanAct = false;
 	TakenDamage = DamageAmount;
-	CurHP -= DamageAmount;
 	
-	OnTakeDamageExecuted();
-	
-	if (CurHP <= 0)
+	if (HasAuthority())
 	{
-		OnFrozenReleased();
-		Die();
+		CurHP -= DamageAmount;
+	
+		OnTakeDamageExecuted();
+	
+		if (CurHP <= 0)
+		{
+			OnFrozenReleased();
+			Die();
 		
-		return;
+			return;
+		}		
 	}
 	
-	UE_LOG(LogTemp, Warning, TEXT("Frozen"));
+	CanAct = false;
 	EnumAddFlags(eStatesFlag, EEnemyStateFlags::FROZEN);
 	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(OriginalMaterial, this);
 	DynamicMaterial->SetVectorParameterValue("EmissiveColor", FLinearColor(0.0f, 0.0f, 1.0f));
@@ -137,22 +145,26 @@ void APMPMonster::OnFrozenReleased()
 void APMPMonster::SetSlow(float DamageAmount)
 {
 	TakenDamage = DamageAmount;
-	CurHP -= DamageAmount;
 	
-	OnTakeDamageExecuted();
-	
-	if (CurHP <= 0)
+	if (HasAuthority())
 	{
-		OnSlowReleased();
-		Die();
+		CurHP -= DamageAmount;
 		
-		return;
+		OnTakeDamageExecuted();
+		
+		if (CurHP <= 0)
+		{
+			OnSlowReleased();
+			Die();
+			
+			return;
+		}
 	}
 	
 	EnumAddFlags(eStatesFlag, EEnemyStateFlags::SLOW);
 	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(OriginalMaterial, this);
-	DynamicMaterial->SetVectorParameterValue("EmissiveColor", FLinearColor(0.0f, 0.6f, 0.0f));
-	DynamicMaterial->SetScalarParameterValue("EmissiveIntensity", 1.0f);
+	DynamicMaterial->SetVectorParameterValue("EmissiveColor", FLinearColor(0.0f, 0.3f, 0.0f));
+	DynamicMaterial->SetScalarParameterValue("EmissiveIntensity", 10.0f);
 	GetMesh()->SetMaterial(0, DynamicMaterial);
 	DynamicMaterial->PostEditChange();
 	

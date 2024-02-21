@@ -224,7 +224,6 @@ void APMPMonsterBear::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	}
 	else if (Montage == AnimInstance->BearDieMontage)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("bear die end"));
 		Destroy();
 		return;
 	}

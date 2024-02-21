@@ -34,7 +34,7 @@ APMPProjectile::APMPProjectile()
 
 void APMPProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                            FVector NormalImpulse, const FHitResult& Hit)
-{
+{	
 	if (eProjectileType == EProjectileType::MURIEL_NORMAL)
 	{
 		if ((OtherActor != nullptr) && (OtherComp != nullptr))

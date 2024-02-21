@@ -75,6 +75,7 @@ void APMPCharacter::BeginPlay()
 	}
 
 	AnimInstance = Cast<UPMPAnimInstance>(GetMesh()->GetAnimInstance());
+	OriginalMaterial = GetMesh()->GetMaterial(0);
 }
 
 void APMPCharacter::Tick(float DeltaSeconds)
@@ -122,6 +123,8 @@ void APMPCharacter::Tick(float DeltaSeconds)
 			
 				// Focusing
 
+				if (PMPMonster == nullptr)
+					return;
 				
 				FVector Target = PMPMonster->GetActorLocation();
 				//float Dist = GetDistanceTo(PMPMonster);
@@ -286,11 +289,14 @@ void APMPCharacter::ToggleFocusing()
 float APMPCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
                                 AActor* DamageCauser)
 {
+	if (EnumHasAnyFlags(eStatesFlag, EStateFlags::INVINCIBLE))
+		DamageAmount = 0.f;
+	
 	TakenDamage = DamageAmount;
 	CurHP -= DamageAmount;
 	CurHP = CurHP > MaxHP ? MaxHP : CurHP;
 	
-	if (DamageAmount > 0.f)
+	if (DamageAmount >= 0.f)
 		OnTakeDamageExecuted();
 	else if (DamageAmount < 0.f)
 		OnTakeHealExecuted();
@@ -298,4 +304,73 @@ float APMPCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEv
 	UpdateHUDHP();
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+void APMPCharacter::SetBoost()
+{	
+	EnumAddFlags(eStatesFlag, EStateFlags::BOOST);
+	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(OriginalMaterial, this);
+	DynamicMaterial->SetVectorParameterValue("EmissiveColor", FLinearColor(0.7f, 1.f, 1.f));
+	DynamicMaterial->SetScalarParameterValue("EmissiveIntensity", 3.0f);
+	GetMesh()->SetMaterial(0, DynamicMaterial);
+	DynamicMaterial->PostEditChange();
+
+	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed * 1.5;
+	
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &APMPCharacter::OnBoostReleased, 8.0f, false);
+}
+
+void APMPCharacter::OnBoostReleased()
+{
+	GetMesh()->SetMaterial(0, OriginalMaterial);
+    
+	EnumRemoveFlags(eStatesFlag, EStateFlags::BOOST);
+	
+	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
+}
+
+void APMPCharacter::SetStrengthen()
+{	
+	EnumAddFlags(eStatesFlag, EStateFlags::STRENGTHENED);
+	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(OriginalMaterial, this);
+	DynamicMaterial->SetVectorParameterValue("EmissiveColor", FLinearColor(1.f, 0.2f, 0.2f));
+	DynamicMaterial->SetScalarParameterValue("EmissiveIntensity", 3.0f);
+	GetMesh()->SetMaterial(0, DynamicMaterial);
+	DynamicMaterial->PostEditChange();
+
+	Damage = int32(float(DefaultDamage) * 1.5f);
+	
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &APMPCharacter::OnStrengthenReleased, 8.0f, false);
+}
+
+void APMPCharacter::OnStrengthenReleased()
+{
+	GetMesh()->SetMaterial(0, OriginalMaterial);
+    
+	EnumRemoveFlags(eStatesFlag, EStateFlags::STRENGTHENED);
+	
+	Damage = DefaultDamage;
+}
+
+void APMPCharacter::SetInvincible()
+{
+	EnumAddFlags(eStatesFlag, EStateFlags::INVINCIBLE);
+	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(OriginalMaterial, this);
+	DynamicMaterial->SetVectorParameterValue("EmissiveColor", FLinearColor(1.f, 1.f, 0.2f));
+	DynamicMaterial->SetScalarParameterValue("EmissiveIntensity", 3.0f);
+	GetMesh()->SetMaterial(0, DynamicMaterial);
+	DynamicMaterial->PostEditChange();
+	
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &APMPCharacter::OnInvincibleReleased, 8.0f, false);
+
+}
+
+void APMPCharacter::OnInvincibleReleased()
+{
+	GetMesh()->SetMaterial(0, OriginalMaterial);
+    
+	EnumRemoveFlags(eStatesFlag, EStateFlags::INVINCIBLE);
 }

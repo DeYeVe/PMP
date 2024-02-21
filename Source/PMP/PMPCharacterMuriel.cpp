@@ -11,6 +11,7 @@
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystem.h"
 
 APMPCharacterMuriel::APMPCharacterMuriel()
 {
@@ -27,7 +28,8 @@ APMPCharacterMuriel::APMPCharacterMuriel()
 
 	MeshCharacter->SetupAttachment(RootComponent);
 	
-	Damage = 20;
+	DefaultDamage = 20;
+	Damage = DefaultDamage;
 	MaxHP = 200;
 	CurHP = 200;
 	
@@ -36,7 +38,7 @@ APMPCharacterMuriel::APMPCharacterMuriel()
 	SkillCooldown[2] = 10.0f;
 
 	// projectile
-	auto InitProjectile = [this](const FString& ProjectilePath, TSubclassOf<class APMPProjectile>& ProjectileClass)
+	auto InitProjectile = [this](TSubclassOf<class APMPProjectile>& ProjectileClass, const FString& ProjectilePath)
 	{
 		const ConstructorHelpers::FClassFinder<AActor> ProjectileFinder(*ProjectilePath);
 		if (ProjectileFinder.Class != nullptr)
@@ -44,9 +46,15 @@ APMPCharacterMuriel::APMPCharacterMuriel()
 			ProjectileClass = ProjectileFinder.Class;
 		}
 	};
-	InitProjectile(TEXT("Blueprint'/Game/Player/Muriel/BP_MurielProjectileNormal.BP_MurielProjectileNormal_C'"), AttackProjectileClass);
-	InitProjectile(TEXT("Blueprint'/Game/Player/Muriel/BP_MurielProjectileSkill1.BP_MurielProjectileSkill1_C'"), Skill1ProjectileClass);
-	InitProjectile(TEXT("Blueprint'/Game/Player/Muriel/BP_MurielProjectileSkill2.BP_MurielProjectileSkill2_C'"), Skill2ProjectileClass);
+	InitProjectile(AttackProjectileClass, TEXT("Blueprint'/Game/Player/Muriel/BP_MurielProjectileNormal.BP_MurielProjectileNormal_C'"));
+	InitProjectile(Skill1ProjectileClass, TEXT("Blueprint'/Game/Player/Muriel/BP_MurielProjectileSkill1.BP_MurielProjectileSkill1_C'"));
+	InitProjectile(Skill2ProjectileClass, TEXT("Blueprint'/Game/Player/Muriel/BP_MurielProjectileSkill2.BP_MurielProjectileSkill2_C'"));
+
+	const ConstructorHelpers::FObjectFinder<UParticleSystem> FXFinder(TEXT("ParticleSystem'/Game/ParagonMuriel/FX/Particles/Abilities/ConsGround/FX/P_ConsGround_Bubble.P_ConsGround_Bubble'"));
+	if (FXFinder.Succeeded())
+	{
+		SKill_3FX = FXFinder.Object;
+	}
 }
 
 void APMPCharacterMuriel::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -261,22 +269,89 @@ void APMPCharacterMuriel::SpawnSkill_2()
 void APMPCharacterMuriel::Skill_3()
 {
 	Super::Skill_3();
+	
+	if(EnumHasAnyFlags(eStatesFlag, EStateFlags::ACTING))
+		return;
+
+	if (GetCharacterMovement()->IsFalling())
+		return;
+
+	if (IsSkillOnCooldown[2])
+		return;
+
+	if (!HasAuthority())
+		LocalSkill_3();
+	
+	ServerSkill_3();
 }
 
 void APMPCharacterMuriel::LocalSkill_3()
 {
+	AnimInstance->PlayMurielSkill_3Montage();
+	
+	EnumAddFlags(eStatesFlag, EStateFlags::ACTING);
+	GetCharacterMovement()->SetJumpAllowed(false);
+	GetCharacterMovement()->SetMovementMode(MOVE_None);
+	
+	StartSkillCooldown(2);
 }
 
 void APMPCharacterMuriel::ServerSkill_3_Implementation()
 {
+	MulticastSkill_3();
 }
 
 void APMPCharacterMuriel::MulticastSkill_3_Implementation()
 {
+	if (IsLocallyControlled() && !HasAuthority())
+		return;
+	
+	LocalSkill_3();
 }
 
 void APMPCharacterMuriel::SpawnSkill_3()
 {
+	if (SKill_3FX != nullptr)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SKill_3FX, GetActorLocation());
+	}
+	
+	TArray<FHitResult> HitResults;
+	FCollisionQueryParams Params(NAME_None, false, this);
+
+	float AttackRadius = 500.f;
+
+	bool bResult = GetWorld()->SweepMultiByChannel(
+		OUT HitResults,
+		GetActorLocation(),
+		GetActorLocation(),
+		FQuat::Identity,
+		ECollisionChannel::ECC_MAX,
+		FCollisionShape::MakeSphere(AttackRadius),
+		Params);
+
+	if (DEBUG_FLAG)
+	{		
+		FVector Center = GetActorLocation();
+	
+		DrawDebugCylinder(GetWorld(), GetActorLocation(), GetActorLocation() + FVector(0, 0, 1), 500.0f, 32, bResult ? FColor::Green : FColor::Red, false, 2.f);
+	}
+
+	for (auto HitResult : HitResults)
+	{
+		if (bResult && IsValid(HitResult.GetActor()))
+		{
+			FDamageEvent DamageEvent;
+			if (HitResult.GetActor()->IsA(APMPMonster::StaticClass()))
+			{
+				Cast<APMPMonster>(HitResult.GetActor())->TakeDamage(float(GetDamage()) * 2.5, DamageEvent, GetController(), this);
+			}
+			else if (HitResult.GetActor()->IsA(APMPCharacter::StaticClass()))
+			{
+				Cast<APMPCharacter>(HitResult.GetActor())->TakeDamage(- float(GetDamage()) * 2.5, DamageEvent, GetController(), this);
+			}
+		}
+	}
 }
 
 void APMPCharacterMuriel::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)

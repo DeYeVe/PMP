@@ -47,6 +47,9 @@ void UBTService_SearchTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8*
             		
 			for (auto& OverlapResult : OverlapResults)
 			{
+				if (!(OverlapResult.GetActor()->IsA(APMPCharacter::StaticClass())))
+					continue;
+				
 				if (PMPCharacter == nullptr)
 				{
 					PMPCharacter = Cast<APMPCharacter>(OverlapResult.GetActor());

@@ -4,19 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "PMPMonster.h"
-#include "PMPMonsterBear.generated.h"
+#include "PMPMonsterSpider.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PMP_API APMPMonsterBear : public APMPMonster
+class PMP_API APMPMonsterSpider : public APMPMonster
 {
 	GENERATED_BODY()
 
 public:
-	APMPMonsterBear();
-	
+	APMPMonsterSpider();
+		
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -4,6 +4,7 @@
 #include "BTService_CheckCanAct.h"
 
 #include "AIController.h"
+#include "PMPBoss.h"
 #include "PMPMonster.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -24,6 +25,17 @@ void UBTService_CheckCanAct::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* 
 	if (CurrentPawn->IsA(APMPMonster::StaticClass()))
 	{
 		if (Cast<APMPMonster>(CurrentPawn)->GetCanAct())
+		{
+			OwnerComp.GetBlackboardComponent()->SetValueAsBool(FName(TEXT("CanAct")), true);
+		}
+		else
+		{
+			OwnerComp.GetBlackboardComponent()->SetValueAsBool(FName(TEXT("CanAct")), false);			
+		}
+	}
+	else if(CurrentPawn->IsA(APMPBoss::StaticClass()))
+	{
+		if (Cast<APMPBoss>(CurrentPawn)->GetCanAct())
 		{
 			OwnerComp.GetBlackboardComponent()->SetValueAsBool(FName(TEXT("CanAct")), true);
 		}

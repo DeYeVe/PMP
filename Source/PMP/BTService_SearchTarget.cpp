@@ -6,6 +6,7 @@
 #include "PMPCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "DrawDebugHelpers.h"
+#include "PMPBoss.h"
 #include "PMPGameMode.h"
 
  UBTService_SearchTarget::UBTService_SearchTarget()
@@ -23,6 +24,11 @@ void UBTService_SearchTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8*
 	UWorld* World = CurrentPawn->GetWorld();
 	FVector Center = CurrentPawn->GetActorLocation();
 	float SearchRadius = 800.f;
+ 	
+ 	if (CurrentPawn->IsA(APMPBoss::StaticClass()))
+ 	{
+ 		SearchRadius = 1500.f;
+ 	}
 
 	if (World == nullptr)
 		return;

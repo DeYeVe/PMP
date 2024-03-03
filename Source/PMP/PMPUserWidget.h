@@ -74,4 +74,7 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UImage* InvincibleBG;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UCanvasPanel* SilencePanel;
 };

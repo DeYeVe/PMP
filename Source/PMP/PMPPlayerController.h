@@ -40,6 +40,9 @@ public:
 	void SetHUDBufStrengthen(float RemainingTime, float Duration);
 	UFUNCTION()
 	void SetHUDBuffInvincible(float RemainingTime, float Duration);
+	
+	UFUNCTION()
+	void SetHUDSilence(bool visible);
 
 	UPROPERTY()
 	bool IsBoost;

@@ -34,5 +34,6 @@ void APMPHUD::BeginPlay()
 	PlayerOverlay->BoostPanel->SetVisibility(ESlateVisibility::Hidden);
 	PlayerOverlay->StrengthenPanel->SetVisibility(ESlateVisibility::Hidden);
 	PlayerOverlay->InvinciblePanel->SetVisibility(ESlateVisibility::Hidden);
+	PlayerOverlay->SilencePanel->SetVisibility(ESlateVisibility::Hidden);
 			
 }

@@ -17,7 +17,7 @@ APMPCharacterAurora::APMPCharacterAurora()
 	MeshCharacter->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 	MeshCharacter->SetRelativeLocation(FVector(0.f, 0.f, -96.f));
 	
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> SM(TEXT("SkeletalMesh'/Game/ParagonAurora/Characters/Heroes/Aurora/Meshes/Aurora.Aurora'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> SM(TEXT("SkeletalMesh'/Game/ParagonAurora/Characters/Heroes/Aurora/Skins/GlacialEmpress/Meshes/Aurora_GlacialEmpress.Aurora_GlacialEmpress'"));
 
 	if (SM.Succeeded())
 	{
@@ -35,11 +35,11 @@ APMPCharacterAurora::APMPCharacterAurora()
 			FX = FXFinder.Object;
 		}
 	};
-	InitFX(TEXT("ParticleSystem'/Game/ParagonAurora/FX/Particles/Abilities/Leap/FX/P_Aurora_Decoy_Frost.P_Aurora_Decoy_Frost'"), SKill_1FX);
-	InitFX(TEXT("ParticleSystem'/Game/ParagonAurora/FX/Particles/Abilities/Dash/FX/P_Aurora_Dash_Flare.P_Aurora_Dash_Flare'"), SKill_2FX);
-	InitFX(TEXT("ParticleSystem'/Game/ParagonAurora/FX/Particles/Abilities/Ultimate/FX/P_Aurora_Ultimate_Warmup.P_Aurora_Ultimate_Warmup'"), SKill_3FX_1);
-	InitFX(TEXT("ParticleSystem'/Game/ParagonAurora/FX/Particles/Abilities/Ultimate/FX/P_Aurora_Ultimate_InitialBlast.P_Aurora_Ultimate_InitialBlast'"), SKill_3FX_2);
-	InitFX(TEXT("ParticleSystem'/Game/ParagonAurora/FX/Particles/Abilities/Ultimate/FX/P_Aurora_Frozen_Ground_Water_Ultimate.P_Aurora_Frozen_Ground_Water_Ultimate'"), SKill_3FX_3);
+	InitFX(TEXT("ParticleSystem'/Game/ParagonAurora/FX/Particles/Abilities/Leap/FX/P_Aurora_Decoy_Frost.P_Aurora_Decoy_Frost'"), Skill_1FX);
+	InitFX(TEXT("ParticleSystem'/Game/ParagonAurora/FX/Particles/Abilities/Dash/FX/P_Aurora_Dash_Flare.P_Aurora_Dash_Flare'"), Skill_2FX);
+	InitFX(TEXT("ParticleSystem'/Game/ParagonAurora/FX/Particles/Abilities/Ultimate/FX/P_Aurora_Ultimate_Warmup.P_Aurora_Ultimate_Warmup'"), Skill_3FX_1);
+	InitFX(TEXT("ParticleSystem'/Game/ParagonAurora/FX/Particles/Abilities/Ultimate/FX/P_Aurora_Ultimate_InitialBlast.P_Aurora_Ultimate_InitialBlast'"), Skill_3FX_2);
+	InitFX(TEXT("ParticleSystem'/Game/ParagonAurora/FX/Particles/Abilities/Ultimate/FX/P_Aurora_Frozen_Ground_Water_Ultimate.P_Aurora_Frozen_Ground_Water_Ultimate'"), Skill_3FX_3);
 
 	
 	DefaultDamage = 35;
@@ -166,6 +166,9 @@ void APMPCharacterAurora::Skill_1()
 {
 	Super::Skill_1();
 	
+	if (EnumHasAnyFlags(eStatesFlag, EStateFlags::SILENCED))
+		return;
+	
 	if(EnumHasAnyFlags(eStatesFlag, EStateFlags::ACTING))
 		return;
 
@@ -242,13 +245,13 @@ void APMPCharacterAurora::CheckSkill_1()
 		}
 	}
 		
-	if (SKill_2FX != nullptr)
+	if (Skill_2FX != nullptr)
 	{
 		auto SpawnFX = [this](float f1, float f2, float f3)
 		{
 			FRotator SpawnRotation = GetActorRotation();
 			FVector SpawnLocation = GetActorLocation() + FQuat(SpawnRotation) * FVector(f1, f2, f3);
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SKill_2FX, SpawnLocation, SpawnRotation + FRotator(0.f, 180.f, 0.f));
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Skill_2FX, SpawnLocation, SpawnRotation + FRotator(0.f, 180.f, 0.f));
 		};
 		SpawnFX( 270.f, -360.f, -50.f );
 		SpawnFX( 320.f, -180.f, -50.f );
@@ -261,6 +264,9 @@ void APMPCharacterAurora::CheckSkill_1()
 void APMPCharacterAurora::Skill_2()
 {
 	Super::Skill_2();
+	
+	if (EnumHasAnyFlags(eStatesFlag, EStateFlags::SILENCED))
+		return;
 	
 	if(EnumHasAnyFlags(eStatesFlag, EStateFlags::ACTING))
 		return;
@@ -289,9 +295,9 @@ void APMPCharacterAurora::LocalSkill_2()
 	
 	StartSkillCooldown(1);
 	
-	if (SKill_2FX != nullptr)
+	if (Skill_2FX != nullptr)
 	{
-		UGameplayStatics::SpawnEmitterAttached(SKill_2FX, GetMesh(), FName("Skill2"),
+		UGameplayStatics::SpawnEmitterAttached(Skill_2FX, GetMesh(), FName("Skill2"),
 			FVector(0.f, -80.f, 100.f ), FRotator(0.f, 90.f, 0.f));
 	}
 }
@@ -350,6 +356,9 @@ void APMPCharacterAurora::Skill_3()
 {
 	Super::Skill_3();
 	
+	if (EnumHasAnyFlags(eStatesFlag, EStateFlags::SILENCED))
+		return;
+	
 	if(EnumHasAnyFlags(eStatesFlag, EStateFlags::ACTING))
 		return;
 
@@ -377,9 +386,9 @@ void APMPCharacterAurora::LocalSkill_3()
 	GetCharacterMovement()->GravityScale = 0.f;
 	
 	StartSkillCooldown(2);
-	if (SKill_3FX_1 != nullptr)
+	if (Skill_3FX_1 != nullptr)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SKill_3FX_1, GetActorLocation());
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Skill_3FX_1, GetActorLocation());
 	}
 }
 
@@ -427,16 +436,21 @@ void APMPCharacterAurora::CheckSkill_3()
 			{
 				Cast<APMPMonster>(HitResult.GetActor())->SetFrozen(float(GetDamage()) * 1.4);
 			}
+			else
+			{
+				FDamageEvent DamageEvent;
+				HitResult.GetActor()->TakeDamage(float(GetDamage()) * 1.4, DamageEvent, GetController(), this);
+			}
 		}
 	}
 	
-	if (SKill_3FX_2 != nullptr)
+	if (Skill_3FX_2 != nullptr)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SKill_3FX_2, GetActorLocation() + FVector(0.f, 0.f, -96.f ));
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Skill_3FX_2, GetActorLocation() + FVector(0.f, 0.f, -96.f ));
 	}
-	if (SKill_3FX_3 != nullptr)
+	if (Skill_3FX_3 != nullptr)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SKill_3FX_3, GetActorLocation());
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Skill_3FX_3, GetActorLocation());
 	}
 }
 

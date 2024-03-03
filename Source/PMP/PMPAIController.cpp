@@ -6,17 +6,16 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
-#include "BehaviorTree/BlackboardComponent.h"
 
 APMPAIController::APMPAIController()
 {
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BT(TEXT("BehaviorTree'/Game/Enemies/AI/BT_Enemy.BT_Enemy'"));
+	const ConstructorHelpers::FObjectFinder<UBehaviorTree> BT(TEXT("BehaviorTree'/Game/Enemies/AI/BT_Enemy.BT_Enemy'"));
 	if (BT.Succeeded())
 	{
 		EnemyBehaviorTree = BT.Object;
 	}
 	
-	static ConstructorHelpers::FObjectFinder<UBlackboardData> BD(TEXT("BlackboardData'/Game/Enemies/AI/BB_Enemy.BB_Enemy'"));
+	const ConstructorHelpers::FObjectFinder<UBlackboardData> BD(TEXT("BlackboardData'/Game/Enemies/AI/BB_Enemy.BB_Enemy'"));
 	if (BD.Succeeded())
 	{
 		EnemyBlackboardData = BD.Object;

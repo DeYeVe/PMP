@@ -72,7 +72,7 @@ protected:
 	UPROPERTY(Replicated)
 	int32 TakenDamage;
 	UPROPERTY()
-	float MoveSpeed = 400.f;
+	float MoveSpeed = 300.f;
 
 public:
 	UFUNCTION()

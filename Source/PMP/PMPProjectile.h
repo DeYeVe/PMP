@@ -15,6 +15,7 @@ enum class EProjectileType : uint8
 	MURIEL_NORMAL,
 	MURIEL_SKILL_1,
 	MURIEL_SKILL_2,	
+	SEVAROG_SKILL_1,
 };
 
 UCLASS()

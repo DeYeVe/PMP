@@ -21,14 +21,14 @@ APMPMonsterBear::APMPMonsterBear()
 	MeshMonster->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 	
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> SM(TEXT("SkeletalMesh'/Game/InfinityBladeAdversaries/Enemy/Enemy_Bear/Enemy_Bear.Enemy_Bear'"));
+	const ConstructorHelpers::FObjectFinder<USkeletalMesh> SM(TEXT("SkeletalMesh'/Game/InfinityBladeAdversaries/Enemy/Enemy_Bear/Enemy_Bear.Enemy_Bear'"));
 	
 	if (SM.Succeeded())
 	{
 		MeshMonster->SetSkeletalMesh(SM.Object);
 	}
 
-	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
 	
 	AIControllerClass = APMPAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -191,6 +191,7 @@ void APMPMonsterBear::LocalDie()
 	IsActing = true;
 	AnimInstance->IsActing = true;
 	AnimInstance->PlayBearDieMontage();
+	
 	if(PMPAIController)
 		PMPAIController->Destroy();
 }
@@ -204,6 +205,7 @@ void APMPMonsterBear::MulticastDie_Implementation()
 {
 	if (IsLocallyControlled() && !HasAuthority())
 		return;
+	
 	LocalDie();
 }
 

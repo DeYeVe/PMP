@@ -39,11 +39,8 @@ void APMPProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 	{
 		if ((OtherActor != nullptr) && (OtherComp != nullptr))
 		{
-			if(OtherActor->IsA(APMPMonster::StaticClass()))
-			{
-				FDamageEvent DamageEvent;
-				Cast<APMPMonster>(OtherActor)->TakeDamage(Damage, DamageEvent, ProjectileOwner->GetController(), ProjectileOwner);
-			}
+			FDamageEvent DamageEvent;
+			OtherActor->TakeDamage(GetDamage(), DamageEvent, ProjectileOwner->GetController(), ProjectileOwner);
 			
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitFX, GetActorLocation(), GetActorRotation());
 			Destroy();
@@ -53,16 +50,16 @@ void APMPProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 	{
 		if ((OtherActor != nullptr) && (OtherComp != nullptr))
 		{
-			if (OtherActor->IsA(APMPMonster::StaticClass()))
+			if (OtherActor->IsA(APMPCharacter::StaticClass()))
 			{
 				FDamageEvent DamageEvent;
-				Cast<APMPMonster>(OtherActor)->TakeDamage(Damage, DamageEvent, ProjectileOwner->GetController(), ProjectileOwner);
+				Cast<APMPCharacter>(OtherActor)->TakeDamage(-GetDamage(), DamageEvent, ProjectileOwner->GetController(), ProjectileOwner);
 			}
-			else if (OtherActor->IsA(APMPCharacter::StaticClass()))
+			else
 			{
 				FDamageEvent DamageEvent;
-				Cast<APMPCharacter>(OtherActor)->TakeDamage(-Damage, DamageEvent, ProjectileOwner->GetController(), ProjectileOwner);
-			}
+				OtherActor->TakeDamage(GetDamage(), DamageEvent, ProjectileOwner->GetController(), ProjectileOwner);
+			} 
 			
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitFX, GetActorLocation(), GetActorRotation());
 			Destroy();
@@ -75,7 +72,26 @@ void APMPProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 			if (OtherActor->IsA(APMPMonster::StaticClass()))
 			{
 				FDamageEvent DamageEvent;
-				Cast<APMPMonster>(OtherActor)->SetSlow(Damage);
+				Cast<APMPMonster>(OtherActor)->SetSlow(GetDamage());
+			}
+			else
+			{
+				FDamageEvent DamageEvent;
+				OtherActor->TakeDamage(GetDamage(), DamageEvent, ProjectileOwner->GetController(), ProjectileOwner);
+			}
+			
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitFX, GetActorLocation(), GetActorRotation());
+			Destroy();
+		}		
+	}
+	if (eProjectileType == EProjectileType::SEVAROG_SKILL_1)
+	{
+		if ((OtherActor != nullptr) && (OtherComp != nullptr))
+		{
+			if (OtherActor->IsA(APMPCharacter::StaticClass()))
+			{
+				FDamageEvent DamageEvent;
+				Cast<APMPCharacter>(OtherActor)->TakeDamage(GetDamage(), DamageEvent, ProjectileOwner->GetController(), ProjectileOwner);
 			}
 			
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitFX, GetActorLocation(), GetActorRotation());

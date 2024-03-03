@@ -82,9 +82,6 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, Category=Mesh)
 	USkeletalMeshComponent* MeshCharacter;
-	
-	UPROPERTY()
-	UMaterialInterface* OriginalMaterial;
 
 public:
 	APMPCharacter();
@@ -210,6 +207,11 @@ public:
 	void SetInvincible();
 	UFUNCTION()
 	virtual void OnInvincibleReleased();
+
+	UFUNCTION()
+	void SetSilence();
+	UFUNCTION()
+	virtual void OnSilenceReleased();
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "TakeDamage")
 	void OnTakeDamageExecuted();

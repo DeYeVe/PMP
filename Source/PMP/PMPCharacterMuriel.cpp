@@ -53,7 +53,7 @@ APMPCharacterMuriel::APMPCharacterMuriel()
 	const ConstructorHelpers::FObjectFinder<UParticleSystem> FXFinder(TEXT("ParticleSystem'/Game/ParagonMuriel/FX/Particles/Abilities/ConsGround/FX/P_ConsGround_Bubble.P_ConsGround_Bubble'"));
 	if (FXFinder.Succeeded())
 	{
-		SKill_3FX = FXFinder.Object;
+		Skill_3FX = FXFinder.Object;
 	}
 }
 
@@ -118,29 +118,26 @@ void APMPCharacterMuriel::MulticastAttack_Implementation()
 }
 
 void APMPCharacterMuriel::SpawnAttack()
-{	
-	if (AttackProjectileClass != nullptr)
+{
+	if (IsLocallyControlled() && AttackProjectileClass != nullptr)
 	{
-		FActorSpawnParameters ActorSpawnParams;
-		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-		
 		FVector RelativePosition(0.0f, 60.0f, 70.0f);
 		FVector RelativeVector = GetActorForwardVector() * RelativePosition.X + GetActorRightVector() * RelativePosition.Y + GetActorUpVector() * RelativePosition.Z;
 		FVector StartLocation = GetActorLocation() + RelativeVector;
 		FRotator Rotation = GetFollowCamera()->GetComponentRotation();
-		
+
 		FTransform Transform(Rotation, StartLocation);
 		
-		APMPProjectile* projectile = GetWorld()->SpawnActorDeferred<APMPProjectile>(AttackProjectileClass,Transform);
-		projectile->SetProjectileOwner(this);
-		projectile->SetDamage(Damage);
-		projectile->FinishSpawning(Transform);
-	}	
+		ServerSpawnProjectile(AttackProjectileClass, Transform, Damage);	
+	}
 }
 
 void APMPCharacterMuriel::Skill_1()
 {
 	Super::Skill_1();
+	
+	if (EnumHasAnyFlags(eStatesFlag, EStateFlags::SILENCED))
+		return;
 	
 	if(EnumHasAnyFlags(eStatesFlag, EStateFlags::ACTING))
 		return;
@@ -176,35 +173,32 @@ void APMPCharacterMuriel::ServerSkill_1_Implementation()
 void APMPCharacterMuriel::MulticastSkill_1_Implementation()
 {
 	if (IsLocallyControlled() && !HasAuthority())
-	return;
+		return;
 	
 	LocalSkill_1();
 }
 
 void APMPCharacterMuriel::SpawnSkill_1()
 {
-	if (AttackProjectileClass != nullptr)
+	if (IsLocallyControlled() && Skill1ProjectileClass != nullptr)
 	{
-		FActorSpawnParameters ActorSpawnParams;
-		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-		
 		FVector RelativePosition(0.0f, 60.0f, 70.0f);
 		FVector RelativeVector = GetActorForwardVector() * RelativePosition.X + GetActorRightVector() * RelativePosition.Y + GetActorUpVector() * RelativePosition.Z;
 		FVector StartLocation = GetActorLocation() + RelativeVector;
 		FRotator Rotation = GetFollowCamera()->GetComponentRotation();
 
 		FTransform Transform(Rotation, StartLocation);
-		
-		APMPProjectile* projectile = GetWorld()->SpawnActorDeferred<APMPProjectile>(Skill1ProjectileClass,Transform);
-		projectile->SetProjectileOwner(this);
-		projectile->SetDamage(Damage * 2);
-		projectile->FinishSpawning(Transform);
+
+		ServerSpawnProjectile(Skill1ProjectileClass, Transform, float(Damage) * 2.f);	
 	}	
 }
 
 void APMPCharacterMuriel::Skill_2()
 {
 	Super::Skill_2();
+	
+	if (EnumHasAnyFlags(eStatesFlag, EStateFlags::SILENCED))
+		return;
 	
 	if(EnumHasAnyFlags(eStatesFlag, EStateFlags::ACTING))
 		return;
@@ -247,11 +241,8 @@ void APMPCharacterMuriel::MulticastSkill_2_Implementation()
 
 void APMPCharacterMuriel::SpawnSkill_2()
 {
-	if (AttackProjectileClass != nullptr)
+	if (IsLocallyControlled() && Skill2ProjectileClass != nullptr)
 	{
-		FActorSpawnParameters ActorSpawnParams;
-		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-		
 		FVector RelativePosition(0.0f, 60.0f, 70.0f);
 		FVector RelativeVector = GetActorForwardVector() * RelativePosition.X + GetActorRightVector() * RelativePosition.Y + GetActorUpVector() * RelativePosition.Z;
 		FVector StartLocation = GetActorLocation() + RelativeVector;
@@ -259,16 +250,18 @@ void APMPCharacterMuriel::SpawnSkill_2()
 
 		FTransform Transform(Rotation, StartLocation);
 		
-		APMPProjectile* projectile = GetWorld()->SpawnActorDeferred<APMPProjectile>(Skill2ProjectileClass,Transform);
-		projectile->SetProjectileOwner(this);
-		projectile->SetDamage(int32(float(Damage) * 1.5f));
-		projectile->FinishSpawning(Transform);
-	}	
+		ServerSpawnProjectile(Skill2ProjectileClass, Transform, float(Damage) * 1.5f);	
+	}
 }
+
+
 
 void APMPCharacterMuriel::Skill_3()
 {
 	Super::Skill_3();
+	
+	if (EnumHasAnyFlags(eStatesFlag, EStateFlags::SILENCED))
+		return;
 	
 	if(EnumHasAnyFlags(eStatesFlag, EStateFlags::ACTING))
 		return;
@@ -311,9 +304,9 @@ void APMPCharacterMuriel::MulticastSkill_3_Implementation()
 
 void APMPCharacterMuriel::SpawnSkill_3()
 {
-	if (SKill_3FX != nullptr)
+	if (Skill_3FX != nullptr)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SKill_3FX, GetActorLocation());
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Skill_3FX, GetActorLocation());
 	}
 	
 	TArray<FHitResult> HitResults;
@@ -332,9 +325,7 @@ void APMPCharacterMuriel::SpawnSkill_3()
 
 	if (DEBUG_FLAG)
 	{		
-		FVector Center = GetActorLocation();
-	
-		DrawDebugCylinder(GetWorld(), GetActorLocation(), GetActorLocation() + FVector(0, 0, 1), 500.0f, 32, bResult ? FColor::Green : FColor::Red, false, 2.f);
+		DrawDebugCylinder(GetWorld(), GetActorLocation(), GetActorLocation() + FVector(0, 0, 1), AttackRadius, 32, bResult ? FColor::Green : FColor::Red, false, 2.f);
 	}
 
 	for (auto HitResult : HitResults)
@@ -342,15 +333,31 @@ void APMPCharacterMuriel::SpawnSkill_3()
 		if (bResult && IsValid(HitResult.GetActor()))
 		{
 			FDamageEvent DamageEvent;
-			if (HitResult.GetActor()->IsA(APMPMonster::StaticClass()))
+			if (HitResult.GetActor()->IsA(APMPCharacter::StaticClass()))
 			{
-				Cast<APMPMonster>(HitResult.GetActor())->TakeDamage(float(GetDamage()) * 2.5, DamageEvent, GetController(), this);
+				Cast<APMPCharacter>(HitResult.GetActor())->TakeDamage(- float(GetDamage()) * 2.5f, DamageEvent, GetController(), this);
 			}
-			else if (HitResult.GetActor()->IsA(APMPCharacter::StaticClass()))
+			else
 			{
-				Cast<APMPCharacter>(HitResult.GetActor())->TakeDamage(- float(GetDamage()) * 2.5, DamageEvent, GetController(), this);
+				HitResult.GetActor()->TakeDamage(float(GetDamage()) * 2.5, DamageEvent, GetController(), this);
 			}
 		}
+	}
+}
+
+void APMPCharacterMuriel::ServerSpawnProjectile_Implementation(TSubclassOf<APMPProjectile> ProjectileClass,
+	const FTransform& SpawnTransform, int32 ProjectileDamage)
+{
+	MulticastSpawnProjectile(ProjectileClass, SpawnTransform, Damage);	
+}
+
+void APMPCharacterMuriel::MulticastSpawnProjectile_Implementation(TSubclassOf<APMPProjectile> ProjectileClass, const FTransform& SpawnTransform, int32 ProjectileDamage)
+{
+	APMPProjectile* Projectile = GetWorld()->SpawnActor<APMPProjectile>(ProjectileClass, SpawnTransform);
+	if (Projectile)
+	{
+		Projectile->SetProjectileOwner(this);
+		Projectile->SetDamage(ProjectileDamage);
 	}
 }
 

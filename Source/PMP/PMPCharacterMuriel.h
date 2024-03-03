@@ -65,7 +65,13 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSkill_3();
 	UFUNCTION()
-	void SpawnSkill_3();	
+	void SpawnSkill_3();
+
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnProjectile(TSubclassOf<APMPProjectile> ProjectileClass, const FTransform& SpawnTransform, int32 ProjectileDamage);
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSpawnProjectile(TSubclassOf<APMPProjectile> ProjectileClass, const FTransform& SpawnTransform, int32 ProjectileDamage);
+	
 
 	UFUNCTION()
 	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
@@ -79,5 +85,5 @@ public:
 	TSubclassOf<class APMPProjectile> Skill2ProjectileClass;
 	
 	UPROPERTY()
-	UParticleSystem* SKill_3FX;	
+	UParticleSystem* Skill_3FX;	
 };

@@ -149,6 +149,18 @@ void APMPPlayerController::SetHUDBuffInvincible(float RemainingTime, float Durat
 	}
 }
 
+void APMPPlayerController::SetHUDSilence(bool visible)
+{
+	PMPHUD = IsValid(PMPHUD) ? PMPHUD : Cast<APMPHUD>(GetHUD());
+	if (IsValid(PMPHUD) && IsValid(PMPHUD->PlayerOverlay))
+	{
+		if (visible)
+			PMPHUD->PlayerOverlay->SilencePanel->SetVisibility(ESlateVisibility::Visible);
+		else
+			PMPHUD->PlayerOverlay->SilencePanel->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
 void APMPPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);

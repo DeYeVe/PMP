@@ -75,7 +75,6 @@ void APMPCharacter::BeginPlay()
 	}
 
 	AnimInstance = Cast<UPMPAnimInstance>(GetMesh()->GetAnimInstance());
-	OriginalMaterial = GetMesh()->GetMaterial(0);
 }
 
 void APMPCharacter::Tick(float DeltaSeconds)
@@ -103,20 +102,20 @@ void APMPCharacter::Tick(float DeltaSeconds)
 		{
 			if (!OverlapResults.IsEmpty())
 			{
-				APMPMonster* PMPMonster = nullptr;
+				AActor* TargetEnemy = nullptr;
 				float MinDistance = 0.f;
             		
 				for (auto& OverlapResult : OverlapResults)
 				{
-					if (PMPMonster == nullptr)
+					if (TargetEnemy == nullptr)
 					{
-						PMPMonster = Cast<APMPMonster>(OverlapResult.GetActor());
-						MinDistance = GetDistanceTo(PMPMonster);
+						TargetEnemy = OverlapResult.GetActor();
+						MinDistance = GetDistanceTo(TargetEnemy);
 					}
-					else if (MinDistance > GetDistanceTo(Cast<APMPMonster>(OverlapResult.GetActor())))
+					else if (MinDistance > GetDistanceTo(OverlapResult.GetActor()))
 					{
-						PMPMonster = Cast<APMPMonster>(OverlapResult.GetActor());
-						MinDistance = GetDistanceTo(PMPMonster);
+						TargetEnemy = OverlapResult.GetActor();
+						MinDistance = GetDistanceTo(TargetEnemy);
 					}
 				}
 				if(DEBUG_FLAG)	
@@ -124,10 +123,10 @@ void APMPCharacter::Tick(float DeltaSeconds)
 			
 				// Focusing
 
-				if (PMPMonster == nullptr)
+				if (TargetEnemy == nullptr)
 					return;
 				
-				FVector Target = PMPMonster->GetActorLocation();
+				FVector Target = TargetEnemy->GetActorLocation();
 				//float Dist = GetDistanceTo(PMPMonster);
 				//Target.Z -= Dist / FMath::Sqrt(3.f);
 				FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetCameraBoom()->GetComponentLocation(), Target);
@@ -273,7 +272,7 @@ void APMPCharacter::Attack()
 }
 
 void APMPCharacter::Skill_1()
-{
+{	
 }
 
 void APMPCharacter::Skill_2()
@@ -324,11 +323,6 @@ float APMPCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEv
 void APMPCharacter::SetBoost()
 {	
 	EnumAddFlags(eStatesFlag, EStateFlags::BOOST);
-	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(OriginalMaterial, this);
-	DynamicMaterial->SetVectorParameterValue("EmissiveColor", FLinearColor(0.7f, 1.f, 1.f));
-	DynamicMaterial->SetScalarParameterValue("EmissiveIntensity", 3.0f);
-	GetMesh()->SetMaterial(0, DynamicMaterial);
-	DynamicMaterial->PostEditChange();
 
 	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed * 1.5;
 	
@@ -337,8 +331,6 @@ void APMPCharacter::SetBoost()
 
 void APMPCharacter::OnBoostReleased()
 {
-	GetMesh()->SetMaterial(0, OriginalMaterial);
-    
 	EnumRemoveFlags(eStatesFlag, EStateFlags::BOOST);
 	
 	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
@@ -347,11 +339,6 @@ void APMPCharacter::OnBoostReleased()
 void APMPCharacter::SetStrengthen()
 {	
 	EnumAddFlags(eStatesFlag, EStateFlags::STRENGTHENED);
-	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(OriginalMaterial, this);
-	DynamicMaterial->SetVectorParameterValue("EmissiveColor", FLinearColor(1.f, 0.2f, 0.2f));
-	DynamicMaterial->SetScalarParameterValue("EmissiveIntensity", 3.0f);
-	GetMesh()->SetMaterial(0, DynamicMaterial);
-	DynamicMaterial->PostEditChange();
 
 	Damage = int32(float(DefaultDamage) * 1.5f);
 	
@@ -359,9 +346,7 @@ void APMPCharacter::SetStrengthen()
 }
 
 void APMPCharacter::OnStrengthenReleased()
-{
-	GetMesh()->SetMaterial(0, OriginalMaterial);
-    
+{    
 	EnumRemoveFlags(eStatesFlag, EStateFlags::STRENGTHENED);
 	
 	Damage = DefaultDamage;
@@ -370,11 +355,6 @@ void APMPCharacter::OnStrengthenReleased()
 void APMPCharacter::SetInvincible()
 {
 	EnumAddFlags(eStatesFlag, EStateFlags::INVINCIBLE);
-	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(OriginalMaterial, this);
-	DynamicMaterial->SetVectorParameterValue("EmissiveColor", FLinearColor(1.f, 1.f, 0.2f));
-	DynamicMaterial->SetScalarParameterValue("EmissiveIntensity", 3.0f);
-	GetMesh()->SetMaterial(0, DynamicMaterial);
-	DynamicMaterial->PostEditChange();
 	
 	GetWorldTimerManager().SetTimer(BuffTimerHandles[2], this, &APMPCharacter::OnInvincibleReleased, 8.0f, false);
 
@@ -382,7 +362,30 @@ void APMPCharacter::SetInvincible()
 
 void APMPCharacter::OnInvincibleReleased()
 {
-	GetMesh()->SetMaterial(0, OriginalMaterial);
-    
 	EnumRemoveFlags(eStatesFlag, EStateFlags::INVINCIBLE);
+}
+
+void APMPCharacter::SetSilence()
+{
+	EnumAddFlags(eStatesFlag, EStateFlags::SILENCED);
+
+	PMPPlayerController = IsValid(PMPPlayerController) ? PMPPlayerController : Cast<APMPPlayerController>(Controller);
+	if (PMPPlayerController)
+	{
+		PMPPlayerController->SetHUDSilence(true);
+	}
+
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &APMPCharacter::OnSilenceReleased, 5.f, false);
+}
+
+void APMPCharacter::OnSilenceReleased()
+{
+	EnumRemoveFlags(eStatesFlag, EStateFlags::SILENCED);
+
+	PMPPlayerController = IsValid(PMPPlayerController) ? PMPPlayerController : Cast<APMPPlayerController>(Controller);
+	if (PMPPlayerController)
+	{
+		PMPPlayerController->SetHUDSilence(false);
+	}
 }

@@ -27,9 +27,19 @@ UPMPAnimInstance::UPMPAnimInstance()
 	InitMontage(MurielSkill_2Montage, TEXT("AnimMontage'/Game/Player/Muriel/Animation/AM_Skill2.AM_Skill2'"));
 	InitMontage(MurielSkill_3Montage, TEXT("AnimMontage'/Game/Player/Muriel/Animation/AM_Skill3.AM_Skill3'"));
 	
+	InitMontage(SevarogAttackMontage, TEXT("AnimMontage'/Game/Enemies/Sevarog/AM_Attack.AM_Attack'"));
+	InitMontage(SevarogSkill_1Montage, TEXT("AnimMontage'/Game/Enemies/Sevarog/AM_Skill1.AM_Skill1'"));
+	InitMontage(SevarogSkill_2Montage, TEXT("AnimMontage'/Game/Enemies/Sevarog/AM_Skill2.AM_Skill2'"));
+	InitMontage(SevarogSkill_3Montage, TEXT("AnimMontage'/Game/Enemies/Sevarog/AM_Skill3.AM_Skill3'"));
+	InitMontage(SevarogSkill_4Montage, TEXT("AnimMontage'/Game/Enemies/Sevarog/AM_Skill4.AM_Skill4'"));
+	
 	InitMontage(BearAttackMontage, TEXT("AnimMontage'/Game/Enemies/Bear/AM_Attack.AM_Attack'"));
 	InitMontage(BearHitMontage, TEXT("AnimMontage'/Game/Enemies/Bear/AM_Hit.AM_Hit'"));
 	InitMontage(BearDieMontage, TEXT("AnimMontage'/Game/Enemies/Bear/AM_Die.AM_Die'"));
+
+	InitMontage(SpiderAttackMontage, TEXT("AnimMontage'/Game/Enemies/Spider/AM_Attack.AM_Attack'"));
+	InitMontage(SpiderHitMontage, TEXT("AnimMontage'/Game/Enemies/Spider/AM_Hit.AM_Hit'"));
+	InitMontage(SpiderDieMontage, TEXT("AnimMontage'/Game/Enemies/Spider/AM_Die.AM_Die'"));
 }
 
 void UPMPAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -114,6 +124,46 @@ void UPMPAnimInstance::PlayMurielSkill_3Montage()
 	Montage_Play(MurielSkill_3Montage, PlayRate);
 }
 
+void UPMPAnimInstance::PlaySevarogAttackMontage()
+{
+	if (!IsValid(SevarogAttackMontage))
+		return;
+	
+	Montage_Play(SevarogAttackMontage, PlayRate);
+}
+
+void UPMPAnimInstance::PlaySevarogSkill_1Montage()
+{
+	if (!IsValid(SevarogSkill_1Montage))
+		return;
+	
+	Montage_Play(SevarogSkill_1Montage, PlayRate);
+}
+
+void UPMPAnimInstance::PlaySevarogSkill_2Montage()
+{
+	if (!IsValid(SevarogSkill_2Montage))
+		return;
+	
+	Montage_Play(SevarogSkill_2Montage, PlayRate);
+}
+
+void UPMPAnimInstance::PlaySevarogSkill_3Montage()
+{
+	if (!IsValid(SevarogSkill_3Montage))
+		return;
+	
+	Montage_Play(SevarogSkill_3Montage, PlayRate);
+}
+
+void UPMPAnimInstance::PlaySevarogSkill_4Montage()
+{
+	if (!IsValid(SevarogSkill_4Montage))
+		return;
+	
+	Montage_Play(SevarogSkill_4Montage, PlayRate);
+}
+
 void UPMPAnimInstance::PlayBearAttackMontage()
 {
 	if (!IsValid(BearAttackMontage))
@@ -128,8 +178,6 @@ void UPMPAnimInstance::PlayBearHitMontage()
 		return;
 	
 	Montage_Play(BearHitMontage, PlayRate);
-	
-	UE_LOG(LogTemp, Warning, TEXT("hit bear montage playRate %f"), PlayRate);
 }
 
 void UPMPAnimInstance::PlayBearDieMontage()
@@ -138,6 +186,30 @@ void UPMPAnimInstance::PlayBearDieMontage()
 		return;
 	
 	Montage_Play(BearDieMontage, PlayRate);
+}
+
+void UPMPAnimInstance::PlaySpiderAttackMontage()
+{
+	if (!IsValid(SpiderAttackMontage))
+		return;
+	
+	Montage_Play(SpiderAttackMontage, PlayRate);
+}
+
+void UPMPAnimInstance::PlaySpiderHitMontage()
+{
+	if (!IsValid(SpiderHitMontage))
+		return;
+	
+	Montage_Play(SpiderHitMontage, PlayRate);
+}
+
+void UPMPAnimInstance::PlaySpiderDieMontage()
+{
+	if (!IsValid(SpiderDieMontage))
+		return;
+	
+	Montage_Play(SpiderDieMontage, PlayRate);
 }
 
 void UPMPAnimInstance::AnimNotify_AuroraAttack() const
@@ -180,7 +252,37 @@ void UPMPAnimInstance::AnimNotify_MurielSkill_3() const
 	OnMurielSkill_3.Broadcast();
 }
 
+void UPMPAnimInstance::AnimNotify_SevarogAttack() const
+{
+	OnSevarogAttack.Broadcast();
+}
+
+void UPMPAnimInstance::AnimNotify_SevarogSkill_1() const
+{
+	OnSevarogSkill_1.Broadcast();
+}
+
+void UPMPAnimInstance::AnimNotify_SevarogSkill_2() const
+{
+	OnSevarogSkill_2.Broadcast();
+}
+
+void UPMPAnimInstance::AnimNotify_SevarogSkill_3() const
+{
+	OnSevarogSkill_3.Broadcast();
+}
+
+void UPMPAnimInstance::AnimNotify_SevarogSkill_4() const
+{
+	OnSevarogSkill_4.Broadcast();
+}
+
 void UPMPAnimInstance::AnimNotify_BearAttack() const
 {
 	OnBearAttack.Broadcast();
+}
+
+void UPMPAnimInstance::AnimNotify_SpiderAttack() const
+{
+	OnSpiderAttack.Broadcast();
 }

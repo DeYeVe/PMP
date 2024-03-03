@@ -79,13 +79,13 @@ private:
 
 private:
 	UPROPERTY()
-	UParticleSystem* SKill_1FX;
+	UParticleSystem* Skill_1FX;
 	UPROPERTY()
-	UParticleSystem* SKill_2FX;
+	UParticleSystem* Skill_2FX;
 	UPROPERTY()
-	UParticleSystem* SKill_3FX_1;
+	UParticleSystem* Skill_3FX_1;
 	UPROPERTY()
-	UParticleSystem* SKill_3FX_2;
+	UParticleSystem* Skill_3FX_2;
 	UPROPERTY()
-	UParticleSystem* SKill_3FX_3;	
+	UParticleSystem* Skill_3FX_3;	
 };

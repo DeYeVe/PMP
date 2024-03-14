@@ -67,6 +67,7 @@ APMPBoss::APMPBoss()
 	};
 	InitFX(Skill_3FX, TEXT("ParticleSystem'/Game/ParagonSevarog/FX/Particles/Abilities/Subjugate/FX/P_SubjugateSwirls.P_SubjugateSwirls'"));
 	InitFX(Skill_4FX, TEXT("ParticleSystem'/Game/ParagonSevarog/FX/Particles/Abilities/Ultimate/FX/P_UltActivate.P_UltActivate'"));
+	InitFX(DieFX, TEXT("ParticleSystem'/Game/ParagonSevarog/FX/Particles/Abilities/Primary/FX/P_Sevarog_Melee_SucessfulImpact.P_Sevarog_Melee_SucessfulImpact'"));
 	
 	// decal
 	const ConstructorHelpers::FClassFinder<ADecalActor> DecalFinder(TEXT("Blueprint'/Game/Enemies/Sevarog/BP_SevarogSkill3Decal.BP_SevarogSkill3Decal_C'"));
@@ -153,8 +154,6 @@ void APMPBoss::OnRep_HP(int32 LastHP)
 
 void APMPBoss::Attack()
 {
-	CanAct = false;
-
 	if (!HasAuthority())
 		LocalAttack();
 	
@@ -214,8 +213,6 @@ void APMPBoss::CheckAttack()
 
 void APMPBoss::Skill_1()
 {
-	CanAct = false;
-	
 	if (!HasAuthority())
 		LocalSkill_1();
 	
@@ -270,8 +267,6 @@ void APMPBoss::SpawnSkill_1()
 
 void APMPBoss::Skill_2()
 {
-	CanAct = false;
-	
 	if (!HasAuthority())
 		LocalSkill_2();
 	
@@ -316,8 +311,6 @@ void APMPBoss::SpawnSkill_2()
 
 void APMPBoss::Skill_3()
 {
-	CanAct = false;
-	
 	if (!HasAuthority())
 		LocalSkill_3();
 	
@@ -368,6 +361,7 @@ void APMPBoss::GenerateRandomLocationAndSync()
 				RandomLocation = RandomLocation + FVector(FMath::RandPointInCircle(510.f), 0.f);
 			}
 			MulticastSyncRandomLocation(RandomLocation);
+			UE_LOG(LogTemp, Warning, TEXT("z : %f"),RandomLocation.Z);
 		}
 	}
 }
@@ -387,13 +381,12 @@ void APMPBoss::MulticastSyncRandomLocation_Implementation(const FVector& RandomL
 void APMPBoss::SyncRandomLocation_Implementation(APlayerController* PlayerController, const FVector& RandomLocation)
 {
 	FVector TargetLocation = RandomLocation;
-	TargetLocation.Z = -10.f;
+	TargetLocation.Z = TargetLocation.Z - 106.f;
 	FTransform Transform(TargetLocation);
 		
 	ADecalActor* Decal = GetWorld()->SpawnActor<ADecalActor>(Skill3DecalClass, Transform);
 	Decal->SetLifeSpan(1.5f);
-		
-	TargetLocation.Z = 10.f;
+	
 	FTimerHandle TimerHandleFX;
 	GetWorldTimerManager().SetTimer(TimerHandleFX, [&, TargetLocation]()
 	{
@@ -440,9 +433,7 @@ void APMPBoss::SyncRandomLocation_Implementation(APlayerController* PlayerContro
 }
 
 void APMPBoss::Skill_4()
-{
-	CanAct = false;
-	
+{	
 	if (!HasAuthority())
 		LocalSkill_4();
 	
@@ -496,6 +487,42 @@ void APMPBoss::MulticastSpawnProjectile_Implementation(TSubclassOf<APMPProjectil
 	}
 }
 
+void APMPBoss::Die()
+{
+	CanAct = false;
+	
+	if(IsActing)
+		return;
+
+	if (!HasAuthority())
+		LocalDie();
+	
+	ServerDie();
+}
+
+void APMPBoss::LocalDie()
+{
+	IsActing = true;
+	AnimInstance->IsActing = true;
+	AnimInstance->PlaySevarogDieMontage();
+
+	if(PMPAIController)
+		PMPAIController->Destroy();
+}
+
+void APMPBoss::ServerDie_Implementation()
+{
+	MulticastDie();
+}
+
+void APMPBoss::MulticastDie_Implementation()
+{
+	if (IsLocallyControlled() && !HasAuthority())
+		return;
+	
+	LocalDie();
+}
+
 float APMPBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
                            AActor* DamageCauser)
 {
@@ -509,7 +536,7 @@ float APMPBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 	
 	if (CurHP <= 0)
 	{
-		//Die();
+		Die();
 	}
 	
 	OnTakeDamageExecuted();
@@ -576,6 +603,16 @@ void APMPBoss::SearchTarget()
 
 void APMPBoss::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	CanAct = true;
+	if (Montage == AnimInstance->SevarogDieMontage)
+	{		
+		if (DieFX != nullptr)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DieFX, GetActorLocation(),
+				GetActorRotation(), FVector(3.f));
+		}
+
+		CanAct = false;
+		Destroy();
+	}
 }
 

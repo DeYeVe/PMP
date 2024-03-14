@@ -73,7 +73,7 @@ void APMPCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-
+	
 	AnimInstance = Cast<UPMPAnimInstance>(GetMesh()->GetAnimInstance());
 }
 

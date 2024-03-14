@@ -32,6 +32,7 @@ UPMPAnimInstance::UPMPAnimInstance()
 	InitMontage(SevarogSkill_2Montage, TEXT("AnimMontage'/Game/Enemies/Sevarog/AM_Skill2.AM_Skill2'"));
 	InitMontage(SevarogSkill_3Montage, TEXT("AnimMontage'/Game/Enemies/Sevarog/AM_Skill3.AM_Skill3'"));
 	InitMontage(SevarogSkill_4Montage, TEXT("AnimMontage'/Game/Enemies/Sevarog/AM_Skill4.AM_Skill4'"));
+	InitMontage(SevarogDieMontage, TEXT("AnimMontage'/Game/Enemies/Sevarog/AM_Die.AM_Die'"));
 	
 	InitMontage(BearAttackMontage, TEXT("AnimMontage'/Game/Enemies/Bear/AM_Attack.AM_Attack'"));
 	InitMontage(BearHitMontage, TEXT("AnimMontage'/Game/Enemies/Bear/AM_Hit.AM_Hit'"));
@@ -162,6 +163,14 @@ void UPMPAnimInstance::PlaySevarogSkill_4Montage()
 		return;
 	
 	Montage_Play(SevarogSkill_4Montage, PlayRate);
+}
+
+void UPMPAnimInstance::PlaySevarogDieMontage()
+{
+	if (!IsValid(SevarogDieMontage))
+		return;
+	
+	Montage_Play(SevarogDieMontage, PlayRate);
 }
 
 void UPMPAnimInstance::PlayBearAttackMontage()

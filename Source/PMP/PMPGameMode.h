@@ -6,7 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "PMPGameMode.generated.h"
 
-#define DEBUG_FLAG true
+#define DEBUG_FLAG false
 
 UCLASS(minimalapi)
 class APMPGameMode : public AGameModeBase

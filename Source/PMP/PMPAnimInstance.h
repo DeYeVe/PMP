@@ -40,6 +40,7 @@ public:
 	void PlaySevarogSkill_2Montage();
 	void PlaySevarogSkill_3Montage();
 	void PlaySevarogSkill_4Montage();
+	void PlaySevarogDieMontage();
 	
 	void PlayBearAttackMontage();
 	void PlayBearHitMontage();
@@ -114,6 +115,8 @@ public:
 	UAnimMontage* SevarogSkill_3Montage;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Sevarog, Meta=(AllowPrivateAccess=true)) \
 	UAnimMontage* SevarogSkill_4Montage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Sevarog, Meta=(AllowPrivateAccess=true)) \
+	UAnimMontage* SevarogDieMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=EnemyBear, Meta=(AllowPrivateAccess=true)) \
 	UAnimMontage* BearAttackMontage;

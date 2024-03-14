@@ -216,19 +216,14 @@ void APMPMonsterBear::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	if (Montage == AnimInstance->BearAttackMontage)
 	{
 		OnAttackEnd.Broadcast();
-		return;
 	}
 	else if (Montage == AnimInstance->BearHitMontage)
 	{
 		OnHitEnd.Broadcast();
 		CanAct = true;
-		return;		
 	}
 	else if (Montage == AnimInstance->BearDieMontage)
 	{
 		Destroy();
-		return;
 	}
-
-	return;
 }

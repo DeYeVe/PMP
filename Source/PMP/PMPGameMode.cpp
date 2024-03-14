@@ -5,6 +5,7 @@
 #include "PMPCharacterMuriel.h"
 #include "PMPPlayerController.h"
 #include "GameFramework/PlayerState.h"
+#include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
 
 APMPGameMode::APMPGameMode()
@@ -23,22 +24,30 @@ void APMPGameMode::PostLogin(APlayerController* NewPlayer)
 
 	NewPlayerController = Cast<APMPPlayerController>(NewPlayer);
 	if (NewPlayerController->GetPlayerState<APlayerState>() && (NewPlayerController->GetPlayerState<APlayerState>()->GetPlayerId() - 256) % 2  == 0)
-	{		
-		if (CharacterAuroraClass != NULL)
+	{
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APMPCharacterAurora::StaticClass(), FoundActors);
+
+		if (FoundActors.Num() > 0)
 		{
-			APMPCharacterAurora* NewCharacter = GetWorld()->SpawnActor<APMPCharacterAurora>(CharacterAuroraClass, FVector(0.f, -100.0f, 96.0f), FRotator());
-			NewPlayerController->Possess(NewCharacter);
-			UE_LOG(LogTemp, Warning, TEXT("login 1p"));
+			APMPCharacterAurora* CharacterAurora = Cast<APMPCharacterAurora>(FoundActors[0]);
+			NewPlayerController->Possess(CharacterAurora);
 		}
+		
+		UE_LOG(LogTemp, Warning, TEXT("login 1p"));
 	}
 	else if (NewPlayerController->GetPlayerState<APlayerState>() && (NewPlayerController->GetPlayerState<APlayerState>()->GetPlayerId() - 256) % 2  == 1)
 	{
-		if (CharacterMurielClass != NULL)
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APMPCharacterMuriel::StaticClass(), FoundActors);
+
+		if (FoundActors.Num() > 0)
 		{
-			APMPCharacterMuriel* NewCharacter = GetWorld()->SpawnActor<APMPCharacterMuriel>(CharacterMurielClass, FVector(0.f, 100.0f, 96.0f), FRotator());
-			NewPlayerController->Possess(NewCharacter);
-			UE_LOG(LogTemp, Warning, TEXT("login 2p"));
-		}		
+			APMPCharacterMuriel* CharacterMuriel = Cast<APMPCharacterMuriel>(FoundActors[0]);
+			NewPlayerController->Possess(CharacterMuriel);
+		}
+		
+		UE_LOG(LogTemp, Warning, TEXT("login 1p"))
 	}
 }
 

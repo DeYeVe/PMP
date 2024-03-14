@@ -127,6 +127,8 @@ private:
 	UParticleSystem* Skill_3FX;
 	UPROPERTY(VisibleAnywhere)
 	UParticleSystem* Skill_4FX;
+	UPROPERTY(VisibleAnywhere)
+	UParticleSystem* DieFX;
 	UPROPERTY(EditDefaultsOnly, Category=Decal)
 	TSubclassOf<class ADecalActor> Skill3DecalClass;
 
@@ -145,6 +147,15 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSpawnProjectile(TSubclassOf<APMPProjectile> ProjectileClass, const FTransform& SpawnTransform, int32 ProjectileDamage);
 
+	UFUNCTION()
+	void Die();
+	UFUNCTION()
+	void LocalDie();
+	UFUNCTION(Server, Reliable)
+	void ServerDie();	
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastDie();
+	
 public:	
 	UPROPERTY(EditDefaultsOnly, Category=Projectile)
 	TSubclassOf<class APMPProjectile> Skill1ProjectileClass;

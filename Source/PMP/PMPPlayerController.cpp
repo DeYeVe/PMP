@@ -179,6 +179,7 @@ void APMPPlayerController::BeginPlay()
 		Cast<APMPCharacter>(GetPawn())->UpdateHUDHP();
 	}
 	
+	ClientSetRotation((FRotator(0.f, 160.f, 0.f)));
 }
 
 void APMPPlayerController::SetupInputComponent()

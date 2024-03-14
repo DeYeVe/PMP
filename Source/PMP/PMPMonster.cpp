@@ -123,7 +123,6 @@ void APMPMonster::SetFrozen(float DamageAmount)
 	DynamicMaterial->SetVectorParameterValue("EmissiveColor", FLinearColor(0.0f, 0.0f, 1.0f));
 	DynamicMaterial->SetScalarParameterValue("EmissiveIntensity", 10.0f);
 	GetMesh()->SetMaterial(0, DynamicMaterial);
-    DynamicMaterial->PostEditChange();
 	
 	AnimInstance->SetPlayRate(0.f);
 	AnimInstance->Montage_SetPlayRate(AnimInstance->GetCurrentActiveMontage(), AnimInstance->GetPlayRate());
@@ -166,7 +165,6 @@ void APMPMonster::SetSlow(float DamageAmount)
 	DynamicMaterial->SetVectorParameterValue("EmissiveColor", FLinearColor(0.0f, 0.3f, 0.0f));
 	DynamicMaterial->SetScalarParameterValue("EmissiveIntensity", 10.0f);
 	GetMesh()->SetMaterial(0, DynamicMaterial);
-	DynamicMaterial->PostEditChange();
 	
 	AnimInstance->SetPlayRate(1.f / 3.f);
 	AnimInstance->Montage_SetPlayRate(AnimInstance->GetCurrentActiveMontage(), AnimInstance->GetPlayRate());

@@ -20,6 +20,9 @@ void APMPHUD::AddPlayerOveray()
 	{
 		PlayerOverlay = CreateWidget<UPMPUserWidget>(PlayerController, PlayerOverlayClass);
 		PlayerOverlay->AddToViewport();
+		if (GetOwningPawn() == nullptr)
+			return;
+		
 		if (!GetOwningPawn()->IsA(APMPCharacterAurora::StaticClass()))
 			PlayerOverlay->AuroraSkill->SetVisibility(ESlateVisibility::Hidden);
 		else if (!GetOwningPawn()->IsA(APMPCharacterMuriel::StaticClass()))

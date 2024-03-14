@@ -27,8 +27,6 @@ APMPMonsterBear::APMPMonsterBear()
 	{
 		MeshMonster->SetSkeletalMesh(SM.Object);
 	}
-
-	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
 	
 	AIControllerClass = APMPAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -43,6 +41,8 @@ APMPMonsterBear::APMPMonsterBear()
 void APMPMonsterBear::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
 
 	AnimInstance->OnMontageEnded.AddDynamic(this, &APMPMonsterBear::OnMontageEnded);
 	AnimInstance->OnBearAttack.AddUObject(this, &APMPMonsterBear::CheckAttack);

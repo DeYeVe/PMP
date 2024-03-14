@@ -28,8 +28,6 @@ APMPMonsterSpider::APMPMonsterSpider()
 		MeshMonster->SetSkeletalMesh(SM.Object);
 	}
 	
-	GetCharacterMovement()->MaxWalkSpeed = 300.f;
-	
 	AIControllerClass = APMPAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	PMPAIController = Cast<APMPAIController>(GetController());
@@ -42,6 +40,8 @@ APMPMonsterSpider::APMPMonsterSpider()
 void APMPMonsterSpider::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
 
 	AnimInstance->OnMontageEnded.AddDynamic(this, &APMPMonsterSpider::OnMontageEnded);
 	AnimInstance->OnSpiderAttack.AddUObject(this, &APMPMonsterSpider::CheckAttack);

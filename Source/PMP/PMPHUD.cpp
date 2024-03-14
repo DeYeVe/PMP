@@ -27,6 +27,11 @@ void APMPHUD::AddPlayerOveray()
 			PlayerOverlay->AuroraSkill->SetVisibility(ESlateVisibility::Hidden);
 		else if (!GetOwningPawn()->IsA(APMPCharacterMuriel::StaticClass()))
 			PlayerOverlay->MurielSkill->SetVisibility(ESlateVisibility::Hidden);
+
+		PlayerOverlay->BoostPanel->SetVisibility(ESlateVisibility::Hidden);
+		PlayerOverlay->StrengthenPanel->SetVisibility(ESlateVisibility::Hidden);
+		PlayerOverlay->InvinciblePanel->SetVisibility(ESlateVisibility::Hidden);
+		PlayerOverlay->SilencePanel->SetVisibility(ESlateVisibility::Hidden);
 	}
 
 }
@@ -34,9 +39,4 @@ void APMPHUD::AddPlayerOveray()
 void APMPHUD::BeginPlay()
 {
 	Super::BeginPlay();
-	PlayerOverlay->BoostPanel->SetVisibility(ESlateVisibility::Hidden);
-	PlayerOverlay->StrengthenPanel->SetVisibility(ESlateVisibility::Hidden);
-	PlayerOverlay->InvinciblePanel->SetVisibility(ESlateVisibility::Hidden);
-	PlayerOverlay->SilencePanel->SetVisibility(ESlateVisibility::Hidden);
-			
 }

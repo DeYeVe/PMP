@@ -23,7 +23,7 @@ void APMPGameMode::PostLogin(APlayerController* NewPlayer)
 	Super::PostLogin(NewPlayer);
 
 	NewPlayerController = Cast<APMPPlayerController>(NewPlayer);
-	if (NewPlayerController->GetPlayerState<APlayerState>() && (NewPlayerController->GetPlayerState<APlayerState>()->GetPlayerId() - 256) % 2  == 0)
+	if (NewPlayerController->GetPlayerState<APlayerState>() && (NewPlayerController->GetPlayerState<APlayerState>()->GetPlayerId() - 256) % 2  == 1)
 	{
 		TArray<AActor*> FoundActors;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APMPCharacterAurora::StaticClass(), FoundActors);
@@ -36,7 +36,7 @@ void APMPGameMode::PostLogin(APlayerController* NewPlayer)
 		
 		UE_LOG(LogTemp, Warning, TEXT("login 1p"));
 	}
-	else if (NewPlayerController->GetPlayerState<APlayerState>() && (NewPlayerController->GetPlayerState<APlayerState>()->GetPlayerId() - 256) % 2  == 1)
+	else if (NewPlayerController->GetPlayerState<APlayerState>() && (NewPlayerController->GetPlayerState<APlayerState>()->GetPlayerId() - 256) % 2  == 0)
 	{
 		TArray<AActor*> FoundActors;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APMPCharacterMuriel::StaticClass(), FoundActors);

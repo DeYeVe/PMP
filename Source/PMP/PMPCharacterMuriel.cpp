@@ -310,7 +310,7 @@ void APMPCharacterMuriel::SpawnSkill_3()
 	}
 	
 	TArray<FHitResult> HitResults;
-	FCollisionQueryParams Params(NAME_None, false, this);
+	FCollisionQueryParams Params(NAME_None, false);
 
 	float AttackRadius = 500.f;
 
@@ -319,7 +319,7 @@ void APMPCharacterMuriel::SpawnSkill_3()
 		GetActorLocation(),
 		GetActorLocation(),
 		FQuat::Identity,
-		ECollisionChannel::ECC_MAX,
+		ECollisionChannel::ECC_Pawn,
 		FCollisionShape::MakeSphere(AttackRadius),
 		Params);
 

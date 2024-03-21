@@ -69,17 +69,12 @@ protected:
 	int32 CurHP;
 	UFUNCTION(BlueprintCallable)
 	virtual void OnRep_HP(int32 LastHP);
-	UPROPERTY(Replicated)
-	int32 TakenDamage;
 	UPROPERTY()
 	float MoveSpeed = 300.f;
 
 public:
 	UFUNCTION()
 	int32 GetDamage() const { return Damage; };
-	
-	UFUNCTION(BlueprintCallable)
-	int32 GetTakenDamage() const { return TakenDamage; };
 	
 	UFUNCTION(BlueprintCallable)
 	int32 GetMaxHP() const { return MaxHP; };
@@ -97,9 +92,11 @@ public:
 	UFUNCTION()
 	virtual void Die();
 	
-	UFUNCTION()	
+	UFUNCTION()
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-
+	UFUNCTION(Server, Reliable)
+	void ServerTakeDamage(float DamageAmount);
+	
 	UFUNCTION()
 	virtual void SetFrozen(float DamageAmount);
 	UFUNCTION()
@@ -113,7 +110,7 @@ public:
 	virtual void OnSlowReleased();
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "TakeDamage")
-	void OnTakeDamageExecuted();
+	void OnTakeDamageExecuted(float TakenDamage);
 
 	UPROPERTY(Replicated)
 	bool IsActing;

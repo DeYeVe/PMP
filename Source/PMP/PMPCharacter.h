@@ -129,7 +129,7 @@ public:
 	
 protected:
 
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	EStateFlags eStatesFlag;
 	UPROPERTY(ReplicatedUsing = OnRep_HP, EditAnywhere, Category = "Player Stats")
 	int32 CurHP;
@@ -141,8 +141,6 @@ protected:
 	int32 DefaultDamage;
 	UFUNCTION(BlueprintCallable)
 	void OnRep_HP(int32 LastHP);
-	UPROPERTY(Replicated)
-	int32 TakenDamage;
 	UPROPERTY()
 	float MoveSpeed = 600.f;
 
@@ -157,9 +155,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetDamage() const { return Damage; };
 	
-	UFUNCTION(BlueprintCallable)
-	int32 GetTakenDamage() const { return TakenDamage; };
-
 public:
 	void UpdateHUDHP();
 	void UpdateHUDSkill();
@@ -192,7 +187,9 @@ public:
 
 	UFUNCTION()
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-
+	UFUNCTION(Server, Reliable)
+	void ServerTakeDamage(float DamageAmount);
+	
 	UFUNCTION()
 	void SetBoost();
 	UFUNCTION()
@@ -214,9 +211,9 @@ public:
 	virtual void OnSilenceReleased();
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "TakeDamage")
-	void OnTakeDamageExecuted();
+	void OnTakeDamageExecuted(float TakenDamage);
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "TakeHeal")
-	void OnTakeHealExecuted();
+	void OnTakeHealExecuted(float TakenDamage);
 };
 

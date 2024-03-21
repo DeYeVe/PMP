@@ -143,13 +143,17 @@ void APMPBoss::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
 	DOREPLIFETIME(APMPBoss, CurHP);
-	DOREPLIFETIME(APMPBoss, TakenDamage);
 	DOREPLIFETIME(APMPBoss, IsActing);
 }
 
 void APMPBoss::OnRep_HP(int32 LastHP)
 {
-	OnTakeDamageExecuted();
+	if (CurHP <= 0)
+	{
+		Die();
+	}
+	
+	OnTakeDamageExecuted(LastHP - CurHP);
 }
 
 void APMPBoss::Attack()
@@ -259,7 +263,7 @@ void APMPBoss::SpawnSkill_1()
 				FRotator Rotation = NormalDirection.Rotation();
 				FTransform Transform(Rotation, StartLocation);
 
-				MulticastSpawnProjectile(Skill1ProjectileClass, Transform, GetDamage());	
+				ServerSpawnProjectile(Skill1ProjectileClass, Transform, GetDamage());	
 			}
 		}
 	}	
@@ -303,12 +307,27 @@ void APMPBoss::SpawnSkill_2()
 			FRotator Rotation = FRotator(0.f, Skill2Offset + 30.f * i, 0.f);
 			FTransform Transform(Rotation, StartLocation);
 		
-			MulticastSpawnProjectile(Skill1ProjectileClass, Transform, GetDamage());	
+			ServerSpawnProjectile(Skill1ProjectileClass, Transform, GetDamage());	
 		}
 		Skill2Offset += 15;
 	}	
 }
 
+void APMPBoss::ServerSpawnProjectile_Implementation(TSubclassOf<APMPProjectile> ProjectileClass,
+	const FTransform& SpawnTransform, int32 ProjectileDamage)
+{
+	MulticastSpawnProjectile(ProjectileClass, SpawnTransform, Damage);	
+}
+
+void APMPBoss::MulticastSpawnProjectile_Implementation(TSubclassOf<APMPProjectile> ProjectileClass, const FTransform& SpawnTransform, int32 ProjectileDamage)
+{
+	APMPProjectile* Projectile = GetWorld()->SpawnActor<APMPProjectile>(ProjectileClass, SpawnTransform);
+	if (Projectile)
+	{
+		Projectile->SetProjectileOwner(this);
+		Projectile->SetDamage(ProjectileDamage);
+	}
+}
 void APMPBoss::Skill_3()
 {
 	if (!HasAuthority())
@@ -343,7 +362,7 @@ void APMPBoss::SpawnSkill_3()
 	}
 }
 
-void APMPBoss::GenerateRandomLocationAndSync()
+void APMPBoss::GenerateRandomLocationAndSync_Implementation()
 {
 	if (Target == nullptr)
 		SearchTarget();
@@ -361,7 +380,6 @@ void APMPBoss::GenerateRandomLocationAndSync()
 				RandomLocation = RandomLocation + FVector(FMath::RandPointInCircle(510.f), 0.f);
 			}
 			MulticastSyncRandomLocation(RandomLocation);
-			UE_LOG(LogTemp, Warning, TEXT("z : %f"),RandomLocation.Z);
 		}
 	}
 }
@@ -378,7 +396,7 @@ void APMPBoss::MulticastSyncRandomLocation_Implementation(const FVector& RandomL
 	}
 }
 
-void APMPBoss::SyncRandomLocation_Implementation(APlayerController* PlayerController, const FVector& RandomLocation)
+void APMPBoss::SyncRandomLocation(APlayerController* PlayerController, const FVector& RandomLocation)
 {
 	FVector TargetLocation = RandomLocation;
 	TargetLocation.Z = TargetLocation.Z - 106.f;
@@ -476,17 +494,6 @@ void APMPBoss::SpawnSkill_4()
 	}
 }
 
-void APMPBoss::MulticastSpawnProjectile_Implementation(TSubclassOf<APMPProjectile> ProjectileClass,
-	const FTransform& SpawnTransform, int32 ProjectileDamage)
-{
-	APMPProjectile* Projectile = GetWorld()->SpawnActor<APMPProjectile>(ProjectileClass, SpawnTransform);
-	if (Projectile)
-	{
-		Projectile->SetProjectileOwner(this);
-		Projectile->SetDamage(ProjectileDamage);
-	}
-}
-
 void APMPBoss::Die()
 {
 	CanAct = false;
@@ -526,12 +533,15 @@ void APMPBoss::MulticastDie_Implementation()
 float APMPBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
                            AActor* DamageCauser)
 {
+	if (HasAuthority())
+		ServerTakeDamage(DamageAmount);
 	
-	TakenDamage = DamageAmount;
-	
-	if (!HasAuthority())
-		return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+
+void APMPBoss::ServerTakeDamage_Implementation(float DamageAmount)
+{
 	CurHP -= DamageAmount;
 	
 	if (CurHP <= 0)
@@ -539,9 +549,7 @@ float APMPBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 		Die();
 	}
 	
-	OnTakeDamageExecuted();
-	
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	OnTakeDamageExecuted(DamageAmount);
 }
 
 void APMPBoss::SearchTarget()

@@ -149,6 +149,7 @@ void APMPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(APMPCharacter, CurHP);
+	DOREPLIFETIME(APMPCharacter, eStatesFlag);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -228,6 +229,12 @@ void APMPCharacter::Look(const FInputActionValue& Value)
 
 void APMPCharacter::OnRep_HP(int32 LastHP)
 {
+	int32 DeltaHP = LastHP - CurHP;
+	if (DeltaHP > 0)
+		OnTakeDamageExecuted(DeltaHP);
+	else
+		OnTakeHealExecuted(DeltaHP);
+	UpdateHUDHP();
 }
 
 void APMPCharacter::UpdateHUDHP()
@@ -303,21 +310,30 @@ void APMPCharacter::ToggleFocusing()
 float APMPCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
                                 AActor* DamageCauser)
 {
+	if (HasAuthority())
+		ServerTakeDamage(DamageAmount);
+	
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+void APMPCharacter::ServerTakeDamage_Implementation(float DamageAmount)
+{
 	if (EnumHasAnyFlags(eStatesFlag, EStateFlags::INVINCIBLE))
 		DamageAmount = 0.f;
-	
-	TakenDamage = DamageAmount;
+
+	float LastHP = CurHP;
 	CurHP -= DamageAmount;
 	CurHP = CurHP > MaxHP ? MaxHP : CurHP;
 	
-	if (DamageAmount >= 0.f)
-		OnTakeDamageExecuted();
-	else if (DamageAmount < 0.f)
-		OnTakeHealExecuted();
-	
-	UpdateHUDHP();
-	
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	float DeltaHP = LastHP - CurHP;
+	if (DeltaHP != 0.f)
+	{
+		if (DeltaHP > 0)
+			OnTakeDamageExecuted(DeltaHP);
+		else
+			OnTakeHealExecuted(DeltaHP);
+		UpdateHUDHP();		
+	}
 }
 
 void APMPCharacter::SetBoost()

@@ -52,13 +52,22 @@ void APMPMonster::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(APMPMonster, CurHP);
-	DOREPLIFETIME(APMPMonster, TakenDamage);
 	DOREPLIFETIME(APMPMonster, IsActing);
 }
 
 void APMPMonster::OnRep_HP(int32 LastHP)
 {
-	OnTakeDamageExecuted();
+	if (CurHP <= 0)
+	{
+		OnSlowReleased();
+		OnFrozenReleased();
+		Die();
+	}
+	else
+	{
+		Hit();
+	}
+	OnTakeDamageExecuted(LastHP - CurHP);
 }
 
 void APMPMonster::Hit()
@@ -76,11 +85,15 @@ void APMPMonster::Die()
 float APMPMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
                               AActor* DamageCauser)
 {
-	TakenDamage = DamageAmount;
+	if (HasAuthority())
+		ServerTakeDamage(DamageAmount);
 	
-	if (!HasAuthority())
-		return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+
+void APMPMonster::ServerTakeDamage_Implementation(float DamageAmount)
+{
 	CurHP -= DamageAmount;
 	
 	if (CurHP <= 0)
@@ -93,20 +106,16 @@ float APMPMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
 	{
 		Hit();
 	}
-	OnTakeDamageExecuted();
-	
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	OnTakeDamageExecuted(DamageAmount);
 }
 
 void APMPMonster::SetFrozen(float DamageAmount)
 {
-	TakenDamage = DamageAmount;
-	
 	if (HasAuthority())
 	{
 		CurHP -= DamageAmount;
 	
-		OnTakeDamageExecuted();
+		OnTakeDamageExecuted(DamageAmount);
 	
 		if (CurHP <= 0)
 		{
@@ -143,13 +152,11 @@ void APMPMonster::OnFrozenReleased()
 
 void APMPMonster::SetSlow(float DamageAmount)
 {
-	TakenDamage = DamageAmount;
-	
 	if (HasAuthority())
 	{
 		CurHP -= DamageAmount;
 		
-		OnTakeDamageExecuted();
+		OnTakeDamageExecuted(DamageAmount);
 		
 		if (CurHP <= 0)
 		{

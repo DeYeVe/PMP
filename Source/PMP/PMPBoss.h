@@ -52,17 +52,12 @@ protected:
 	int32 CurHP;
 	UFUNCTION(BlueprintCallable)
 	virtual void OnRep_HP(int32 LastHP);
-	UPROPERTY(Replicated)
-	int32 TakenDamage;
 	UPROPERTY()
 	float MoveSpeed = 600.f;
 	
 public:
 	UFUNCTION()
 	int32 GetDamage() const { return Damage; };
-	
-	UFUNCTION(BlueprintCallable)
-	int32 GetTakenDamage() const { return TakenDamage; };
 	
 	UFUNCTION(BlueprintCallable)
 	int32 GetMaxHP() const { return MaxHP; };
@@ -104,6 +99,12 @@ public:
 	UFUNCTION()
 	void SpawnSkill_2();
 	int32 Skill2Offset;
+
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnProjectile(TSubclassOf<APMPProjectile> ProjectileClass, const FTransform& SpawnTransform, int32 ProjectileDamage);
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSpawnProjectile(TSubclassOf<APMPProjectile> ProjectileClass, const FTransform& SpawnTransform, int32 ProjectileDamage);
+	
 	
 	UFUNCTION()
 	void Skill_3();
@@ -115,11 +116,11 @@ public:
 	void MulticastSkill_3();
 	UFUNCTION()
 	void SpawnSkill_3();
-	UFUNCTION()
+	UFUNCTION(Server, Reliable)
 	void GenerateRandomLocationAndSync();
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSyncRandomLocation(const FVector& RandomLocation);
-	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
+	UFUNCTION()
 	void SyncRandomLocation(APlayerController* PlayerController, const FVector& RandomLocation);
 
 private:
@@ -143,10 +144,7 @@ public:
 	void MulticastSkill_4();
 	UFUNCTION()
 	void SpawnSkill_4();
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastSpawnProjectile(TSubclassOf<APMPProjectile> ProjectileClass, const FTransform& SpawnTransform, int32 ProjectileDamage);
-
+	
 	UFUNCTION()
 	void Die();
 	UFUNCTION()
@@ -160,11 +158,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category=Projectile)
 	TSubclassOf<class APMPProjectile> Skill1ProjectileClass;
 	
-	UFUNCTION()	
+	UFUNCTION()
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-
+	UFUNCTION(Server, Reliable)
+	void ServerTakeDamage(float DamageAmount);
+	
 	UFUNCTION(BlueprintImplementableEvent, Category = "TakeDamage")
-	void OnTakeDamageExecuted();
+	void OnTakeDamageExecuted(float TakenDamage);
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "TakeDamage")
 	void OnInRange();

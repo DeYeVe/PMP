@@ -116,7 +116,7 @@ public:
 	USkeletalMeshComponent* GetMesh() const { return MeshCharacter; }
 
 protected:
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	FVector2D MovementVector;
 
 	UPROPERTY()
@@ -215,5 +215,8 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "TakeHeal")
 	void OnTakeHealExecuted(float TakenDamage);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSetMovementVector(const FVector2D& NewMovementVector);
 };
 

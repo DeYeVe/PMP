@@ -143,6 +143,11 @@ void APMPCharacter::Tick(float DeltaSeconds)
 				DrawDebugSphere(GetWorld(), GetActorLocation(), SearchRadius, 16, FColor::Red, false, 0.2f);
 		}
 	}
+
+	if (!HasAuthority())
+	{
+		ServerSetMovementVector(MovementVector);
+	}
 }
 
 void APMPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -150,6 +155,7 @@ void APMPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(APMPCharacter, CurHP);
 	DOREPLIFETIME(APMPCharacter, eStatesFlag);
+	DOREPLIFETIME(APMPCharacter, MovementVector);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -404,4 +410,9 @@ void APMPCharacter::OnSilenceReleased()
 	{
 		PMPPlayerController->SetHUDSilence(false);
 	}
+}
+
+void APMPCharacter::ServerSetMovementVector_Implementation(const FVector2D& NewMovementVector)
+{
+	MovementVector = NewMovementVector;
 }

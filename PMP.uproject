@@ -24,10 +24,6 @@
 			]
 		},
 		{
-			"Name": "promethean",
-			"Enabled": true
-		},
-		{
 			"Name": "OnlineSubsystemSteam",
 			"Enabled": true
 		}

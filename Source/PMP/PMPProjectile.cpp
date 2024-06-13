@@ -5,6 +5,7 @@
 
 #include "PMPCharacter.h"
 #include "PMPMonster.h"
+#include "PMPProjectilePool.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "Engine/DamageEvents.h"
@@ -28,7 +29,7 @@ APMPProjectile::APMPProjectile()
 	ProjectileMovement->InitialSpeed = 1200.f;
 	ProjectileMovement->MaxSpeed = 1200.f;
 	ProjectileMovement->ProjectileGravityScale = 0.f;
-
+	
 	InitialLifeSpan = 8.0f;
 }
 
@@ -95,7 +96,14 @@ void APMPProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 			}
 			
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitFX, GetActorLocation(), GetActorRotation());
-			Destroy();
+			if (ProjectilePool)
+			{
+				ProjectilePool->ReturnProjectileToPool(this);
+			}
+			else
+			{
+				Destroy();
+			}
 		}		
 	}
 }

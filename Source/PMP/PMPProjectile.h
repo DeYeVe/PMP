@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "PMPProjectile.generated.h"
 
 class USphereComponent;
@@ -41,12 +42,18 @@ class PMP_API APMPProjectile : public AActor
 	UPROPERTY(EditAnywhere, Category=Projectile)
 	int32 Damage;
 
+	UPROPERTY()
+	class APMPProjectilePool* ProjectilePool;
+
 public:
 	UFUNCTION()
 	void SetDamage(int32 iDamage) { Damage = iDamage; };
 
 	UFUNCTION()
 	int32 GetDamage() const { return Damage; };
+
+	UFUNCTION()
+	void SetProjectilePool(APMPProjectilePool* ProjP) { ProjectilePool = ProjP; };
 	
 public:	
 	APMPProjectile();

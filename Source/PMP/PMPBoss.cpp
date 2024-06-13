@@ -15,6 +15,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Particles/ParticleSystem.h"
+#include "PMPProjectilePool.h"
+#include "Components/SphereComponent.h"
 
 // Sets default values
 APMPBoss::APMPBoss()
@@ -94,7 +96,13 @@ void APMPBoss::BeginPlay()
 
 	
 	AController* BossController = GetWorld()->GetFirstPlayerController();
-	SetOwner(BossController);	
+	SetOwner(BossController);
+	
+	if (ProjectilePoolClass)
+	{
+		ProjectilePool = GetWorld()->SpawnActor<APMPProjectilePool>(ProjectilePoolClass, FTransform::Identity);
+		ProjectilePool->InitProjectileToPool();
+	}
 }
 
 // Called every frame
@@ -144,6 +152,7 @@ void APMPBoss::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 	
 	DOREPLIFETIME(APMPBoss, CurHP);
 	DOREPLIFETIME(APMPBoss, IsActing);
+	DOREPLIFETIME(APMPBoss, ProjectilePool);
 }
 
 void APMPBoss::OnRep_HP(int32 LastHP)
@@ -321,11 +330,9 @@ void APMPBoss::ServerSpawnProjectile_Implementation(TSubclassOf<APMPProjectile> 
 
 void APMPBoss::MulticastSpawnProjectile_Implementation(TSubclassOf<APMPProjectile> ProjectileClass, const FTransform& SpawnTransform, int32 ProjectileDamage)
 {
-	APMPProjectile* Projectile = GetWorld()->SpawnActor<APMPProjectile>(ProjectileClass, SpawnTransform);
-	if (Projectile)
+	if (ProjectilePool)
 	{
-		Projectile->SetProjectileOwner(this);
-		Projectile->SetDamage(ProjectileDamage);
+		APMPProjectile* Projectile = ProjectilePool->GetPooledProjectile(SpawnTransform);
 	}
 }
 void APMPBoss::Skill_3()

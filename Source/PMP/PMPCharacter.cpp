@@ -144,7 +144,7 @@ void APMPCharacter::Tick(float DeltaSeconds)
 		}
 	}
 
-	if (!HasAuthority())
+	if (IsLocallyControlled() && !HasAuthority())
 	{
 		ServerSetMovementVector(MovementVector);
 	}

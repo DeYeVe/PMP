@@ -184,4 +184,10 @@ public:
 	
 	UFUNCTION()
 	virtual void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	
+	UPROPERTY(EditAnywhere, Category=Projectile)
+	TSubclassOf<class APMPProjectilePool> ProjectilePoolClass;
+	
+	UPROPERTY(VisibleAnywhere, Category=Projectile, Replicated)
+	class APMPProjectilePool* ProjectilePool;
 };

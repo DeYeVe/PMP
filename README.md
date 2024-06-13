@@ -97,4 +97,18 @@
 	
 	-> 캐릭터 tick에서 서버로 Movement Vector 값을 전송하고 해당 변수를 Replicate 되도록 하여 해결
 
+ + 최적화
+
+	![3](https://github.com/DeYeVe/PMP/assets/15682508/a8f3df6a-e05d-4b35-baa2-8846d1aa1b01)
+	![1](https://github.com/DeYeVe/PMP/assets/15682508/adbb27b7-7328-4b68-8293-bc75193b798a)
+	
+ 	위와 같은 투사체 발사 동작에서 병목현상 발생
+
+	-> 파티클의 렌더링에서 드로우 수를 줄임
+   
+	-> 투사체들을 미리 생성하여 풀을 만들고 활성화/비활성화를 하며 풀링하도록 구현
+
+ 	![4](https://github.com/DeYeVe/PMP/assets/15682508/aed461ed-c6eb-494f-99a4-d2994db2e06d)
+
+
 	
